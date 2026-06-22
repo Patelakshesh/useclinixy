@@ -57,27 +57,27 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
 export const getAppointments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const page = parseInt((req.query.page as string) as string) || 1;
+    const limit = parseInt((req.query.limit as string) as string) || 10;
     const skip = (page - 1) * limit;
 
     const filter: any = {};
-    if (req.query.date) filter.appointmentDate = req.query.date;
-    if (req.query.status) filter.status = req.query.status;
+    if ((req.query.date as string)) filter.appointmentDate = (req.query.date as string);
+    if ((req.query.status as string)) filter.status = (req.query.status as string);
 
     // RBAC: If logged in as Doctor, they can ONLY see their own appointments
     if (req.user?.role === 'DOCTOR' && req.user?.doctorId) {
       filter.doctorId = req.user.doctorId;
-    } else if (req.query.doctorId) {
-      filter.doctorId = req.query.doctorId;
+    } else if ((req.query.doctorId as string)) {
+      filter.doctorId = (req.query.doctorId as string);
     }
 
     // Fix P2-3: Support patient name search via lookup
     let patientIdFilter: string[] | null = null;
-    if (req.query.search) {
+    if ((req.query.search as string)) {
       const matchingPatients = await Patient.find({
         clinicId,
-        name: { $regex: req.query.search, $options: 'i' }
+        name: { $regex: (req.query.search as string), $options: 'i' }
       }).select('_id');
       patientIdFilter = matchingPatients.map((p: any) => p._id.toString());
       if (patientIdFilter.length > 0) {
@@ -104,12 +104,12 @@ export const getAppointments = async (req: Request, res: Response, next: NextFun
 export const deleteAppointment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const deleted = await appointmentService.deleteAppointment(clinicId, req.params.id);
+    const deleted = await appointmentService.deleteAppointment(clinicId, (req.params.id as string));
     if (!deleted) {
       res.status(404).json({ success: false, message: 'Appointment not found' });
       return;
     }
-    logAudit(req.user?.userId!, 'APPOINTMENT_DELETED', { appointmentId: req.params.id }, clinicId, req.ip);
+    logAudit(req.user?.userId!, 'APPOINTMENT_DELETED', { appointmentId: (req.params.id as string) }, clinicId, req.ip);
     res.status(200).json({ success: true, message: 'Appointment deleted successfully' });
   } catch (error) {
     next(error);
@@ -141,7 +141,7 @@ export const getCalendarAppointments = async (req: Request, res: Response, next:
 export const updateAppointmentStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const appointment = await appointmentService.updateAppointmentStatus(clinicId, req.params.id, req.body.status);
+    const appointment = await appointmentService.updateAppointmentStatus(clinicId, (req.params.id as string), req.body.status);
     if (!appointment) {
       res.status(404).json({ success: false, message: 'Appointment not found' });
       return;
@@ -193,7 +193,7 @@ export const updateAppointmentStatus = async (req: Request, res: Response, next:
 export const updateAppointment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const appointment = await appointmentService.updateAppointment(clinicId, req.params.id, req.body);
+    const appointment = await appointmentService.updateAppointment(clinicId, (req.params.id as string), req.body);
     if (!appointment) {
       res.status(404).json({ success: false, message: 'Appointment not found' });
       return;

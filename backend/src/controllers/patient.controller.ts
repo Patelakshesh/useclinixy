@@ -16,15 +16,15 @@ export const createPatient = async (req: Request, res: Response, next: NextFunct
 export const getPatients = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const page = parseInt((req.query.page as string) as string) || 1;
+    const limit = parseInt((req.query.limit as string) as string) || 10;
     const skip = (page - 1) * limit;
 
     const filter: any = {};
-    if (req.query.search) {
+    if ((req.query.search as string)) {
       filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { mobileNumber: { $regex: req.query.search, $options: 'i' } },
+        { name: { $regex: (req.query.search as string), $options: 'i' } },
+        { mobileNumber: { $regex: (req.query.search as string), $options: 'i' } },
       ];
     }
 
@@ -42,7 +42,7 @@ export const getPatients = async (req: Request, res: Response, next: NextFunctio
 export const getPatientById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const patient = await patientService.getPatientById(clinicId, req.params.id);
+    const patient = await patientService.getPatientById(clinicId, (req.params.id as string));
     if (!patient) {
       res.status(404).json({ success: false, message: 'Patient not found' });
       return;
@@ -56,7 +56,7 @@ export const getPatientById = async (req: Request, res: Response, next: NextFunc
 export const updatePatient = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const patient = await patientService.updatePatient(clinicId, req.params.id, req.body);
+    const patient = await patientService.updatePatient(clinicId, (req.params.id as string), req.body);
     if (!patient) {
       res.status(404).json({ success: false, message: 'Patient not found' });
       return;
@@ -71,12 +71,12 @@ export const updatePatient = async (req: Request, res: Response, next: NextFunct
 export const deletePatient = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const patient = await patientService.deletePatient(clinicId, req.params.id);
+    const patient = await patientService.deletePatient(clinicId, (req.params.id as string));
     if (!patient) {
       res.status(404).json({ success: false, message: 'Patient not found' });
       return;
     }
-    logAudit(req.user?.userId!, 'PATIENT_DELETED', { patientId: req.params.id }, clinicId, req.ip);
+    logAudit(req.user?.userId!, 'PATIENT_DELETED', { patientId: (req.params.id as string) }, clinicId, req.ip);
     res.status(200).json({ success: true, message: 'Patient deleted successfully' });
   } catch (error) {
     next(error);
@@ -87,7 +87,7 @@ export const deletePatient = async (req: Request, res: Response, next: NextFunct
 export const addMedicalHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const history = await patientService.addMedicalHistory(clinicId, { ...req.body, patientId: req.params.id });
+    const history = await patientService.addMedicalHistory(clinicId, { ...req.body, patientId: (req.params.id as string) });
     res.status(201).json({ success: true, data: history });
   } catch (error) {
     next(error);
@@ -97,7 +97,7 @@ export const addMedicalHistory = async (req: Request, res: Response, next: NextF
 export const getMedicalHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const history = await patientService.getMedicalHistory(clinicId, req.params.id);
+    const history = await patientService.getMedicalHistory(clinicId, (req.params.id as string));
     res.status(200).json({ success: true, data: history });
   } catch (error) {
     next(error);
@@ -107,7 +107,7 @@ export const getMedicalHistory = async (req: Request, res: Response, next: NextF
 export const deleteMedicalHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    await patientService.deleteMedicalHistory(clinicId, req.params.historyId);
+    await patientService.deleteMedicalHistory(clinicId, (req.params.historyId as string));
     res.status(200).json({ success: true, message: 'Deleted successfully' });
   } catch (error) {
     next(error);
@@ -118,7 +118,7 @@ export const deleteMedicalHistory = async (req: Request, res: Response, next: Ne
 export const addVitals = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const vitals = await patientService.addVitals(clinicId, { ...req.body, patientId: req.params.id });
+    const vitals = await patientService.addVitals(clinicId, { ...req.body, patientId: (req.params.id as string) });
     res.status(201).json({ success: true, data: vitals });
   } catch (error) {
     next(error);
@@ -128,7 +128,7 @@ export const addVitals = async (req: Request, res: Response, next: NextFunction)
 export const getVitals = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const vitals = await patientService.getVitals(clinicId, req.params.id);
+    const vitals = await patientService.getVitals(clinicId, (req.params.id as string));
     res.status(200).json({ success: true, data: vitals });
   } catch (error) {
     next(error);
@@ -138,7 +138,7 @@ export const getVitals = async (req: Request, res: Response, next: NextFunction)
 export const deleteVitals = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    await patientService.deleteVitals(clinicId, req.params.vitalsId);
+    await patientService.deleteVitals(clinicId, (req.params.vitalsId as string));
     res.status(200).json({ success: true, message: 'Deleted successfully' });
   } catch (error) {
     next(error);

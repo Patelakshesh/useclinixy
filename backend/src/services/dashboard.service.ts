@@ -79,7 +79,7 @@ export const getRecentActivities = async (clinicId: string, user: any) => {
 
   let activities = [
     ...recentAppointments.map(app => {
-      const isNew = Math.abs(app.createdAt.getTime() - app.updatedAt.getTime()) < 1000;
+      const isNew = Math.abs((app as any).createdAt.getTime() - (app as any).updatedAt.getTime()) < 1000;
       let desc = isNew 
         ? `New appointment booked for ${(app.patientId as any)?.name || 'Unknown'} with Dr. ${(app.doctorId as any)?.name || 'Unknown'}`
         : `Appointment updated for ${(app.patientId as any)?.name || 'Unknown'} with Dr. ${(app.doctorId as any)?.name || 'Unknown'}`;
@@ -89,10 +89,10 @@ export const getRecentActivities = async (clinicId: string, user: any) => {
       else if (app.status === 'CONFIRMED') desc = `Appointment CONFIRMED for ${(app.patientId as any)?.name || 'Unknown'}`;
 
       return {
-        id: app._id.toString() + '-app-' + app.updatedAt.getTime(),
+        id: app._id.toString() + '-app-' + (app as any).updatedAt.getTime(),
         type: 'APPOINTMENT',
         description: desc,
-        time: app.updatedAt
+        time: (app as any).updatedAt
       };
     }),
   ];
@@ -101,12 +101,12 @@ export const getRecentActivities = async (clinicId: string, user: any) => {
   if (user.role !== 'DOCTOR') {
     activities.push(
       ...recentPatients.map(pat => {
-        const isNew = Math.abs(pat.createdAt.getTime() - pat.updatedAt.getTime()) < 1000;
+        const isNew = Math.abs((pat as any).createdAt.getTime() - (pat as any).updatedAt.getTime()) < 1000;
         return {
-          id: pat._id.toString() + '-pat-' + pat.updatedAt.getTime(),
+          id: pat._id.toString() + '-pat-' + (pat as any).updatedAt.getTime(),
           type: 'PATIENT',
           description: isNew ? `New patient registered: ${pat.name}` : `Patient record updated: ${pat.name}`,
-          time: pat.updatedAt
+          time: (pat as any).updatedAt
         };
       })
     );

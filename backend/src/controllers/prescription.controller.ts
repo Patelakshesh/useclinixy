@@ -18,7 +18,7 @@ export const createPrescription = async (req: Request, res: Response, next: Next
 export const getPrescriptionByAppointment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const prescription = await prescriptionService.getPrescriptionByAppointment(clinicId, req.params.appointmentId);
+    const prescription = await prescriptionService.getPrescriptionByAppointment(clinicId, (req.params.appointmentId as string));
     if (!prescription) {
       res.status(404).json({ success: false, message: 'Prescription not found' });
       return;
@@ -32,7 +32,7 @@ export const getPrescriptionByAppointment = async (req: Request, res: Response, 
 export const getPatientPrescriptions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const prescriptions = await prescriptionService.getPatientPrescriptions(clinicId, req.params.patientId);
+    const prescriptions = await prescriptionService.getPatientPrescriptions(clinicId, (req.params.patientId as string));
     res.status(200).json({ success: true, data: prescriptions });
   } catch (error) {
     next(error);
@@ -42,7 +42,7 @@ export const getPatientPrescriptions = async (req: Request, res: Response, next:
 export const updatePrescription = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const prescription = await prescriptionService.updatePrescription(clinicId, req.params.id, req.body);
+    const prescription = await prescriptionService.updatePrescription(clinicId, (req.params.id as string), req.body);
     if (!prescription) {
       res.status(404).json({ success: false, message: 'Prescription not found' });
       return;
@@ -56,7 +56,7 @@ export const updatePrescription = async (req: Request, res: Response, next: Next
 export const deletePrescription = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const prescription = await prescriptionService.deletePrescription(clinicId, req.params.id);
+    const prescription = await prescriptionService.deletePrescription(clinicId, (req.params.id as string));
     if (!prescription) {
       res.status(404).json({ success: false, message: 'Prescription not found' });
       return;

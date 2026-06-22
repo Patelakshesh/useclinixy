@@ -16,16 +16,16 @@ export const createDoctor = async (req: Request, res: Response, next: NextFuncti
 export const getDoctors = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const page = parseInt((req.query.page as string) as string) || 1;
+    const limit = parseInt((req.query.limit as string) as string) || 10;
     const skip = (page - 1) * limit;
 
     const filter: any = {};
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.search) {
+    if ((req.query.status as string)) filter.status = (req.query.status as string);
+    if ((req.query.search as string)) {
       filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { specialization: { $regex: req.query.search, $options: 'i' } },
+        { name: { $regex: (req.query.search as string), $options: 'i' } },
+        { specialization: { $regex: (req.query.search as string), $options: 'i' } },
       ];
     }
 
@@ -43,7 +43,7 @@ export const getDoctors = async (req: Request, res: Response, next: NextFunction
 export const getDoctorById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const doctor = await doctorService.getDoctorById(clinicId, req.params.id);
+    const doctor = await doctorService.getDoctorById(clinicId, (req.params.id as string));
     if (!doctor) {
       res.status(404).json({ success: false, message: 'Doctor not found' });
       return;
@@ -57,7 +57,7 @@ export const getDoctorById = async (req: Request, res: Response, next: NextFunct
 export const updateDoctor = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const doctor = await doctorService.updateDoctor(clinicId, req.params.id, req.body);
+    const doctor = await doctorService.updateDoctor(clinicId, (req.params.id as string), req.body);
     if (!doctor) {
       res.status(404).json({ success: false, message: 'Doctor not found' });
       return;
@@ -71,12 +71,12 @@ export const updateDoctor = async (req: Request, res: Response, next: NextFuncti
 export const deleteDoctor = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const doctor = await doctorService.deleteDoctor(clinicId, req.params.id);
+    const doctor = await doctorService.deleteDoctor(clinicId, (req.params.id as string));
     if (!doctor) {
       res.status(404).json({ success: false, message: 'Doctor not found' });
       return;
     }
-    logAudit(req.user?.userId!, 'DOCTOR_DELETED', { doctorId: req.params.id }, clinicId, req.ip);
+    logAudit(req.user?.userId!, 'DOCTOR_DELETED', { doctorId: (req.params.id as string) }, clinicId, req.ip);
     res.status(200).json({ success: true, message: 'Doctor deleted successfully' });
   } catch (error) {
     next(error);
@@ -87,7 +87,7 @@ export const deleteDoctor = async (req: Request, res: Response, next: NextFuncti
 export const createDoctorLeave = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const leave = await doctorService.createDoctorLeave(clinicId, { ...req.body, doctorId: req.params.id });
+    const leave = await doctorService.createDoctorLeave(clinicId, { ...req.body, doctorId: (req.params.id as string) });
     res.status(201).json({ success: true, data: leave, message: 'Leave added successfully' });
   } catch (error) {
     next(error);
@@ -97,7 +97,7 @@ export const createDoctorLeave = async (req: Request, res: Response, next: NextF
 export const getDoctorLeaves = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const leaves = await doctorService.getDoctorLeaves(clinicId, req.params.id);
+    const leaves = await doctorService.getDoctorLeaves(clinicId, (req.params.id as string));
     res.status(200).json({ success: true, data: leaves });
   } catch (error) {
     next(error);
@@ -107,7 +107,7 @@ export const getDoctorLeaves = async (req: Request, res: Response, next: NextFun
 export const deleteDoctorLeave = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const leave = await doctorService.deleteDoctorLeave(clinicId, req.params.leaveId);
+    const leave = await doctorService.deleteDoctorLeave(clinicId, (req.params.leaveId as string));
     if (!leave) {
       res.status(404).json({ success: false, message: 'Leave not found' });
       return;

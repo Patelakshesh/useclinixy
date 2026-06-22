@@ -30,16 +30,16 @@ const indianDoctors = [
 ];
 
 const indianPatients = [
-  { name: 'Aarav Sharma', age: 34, gender: 'MALE', phone: '9876543210' },
-  { name: 'Vivaan Patel', age: 45, gender: 'MALE', phone: '9876543211' },
-  { name: 'Aditya Gupta', age: 28, gender: 'MALE', phone: '9876543212' },
-  { name: 'Vihaan Singh', age: 12, gender: 'MALE', phone: '9876543213' },
-  { name: 'Arjun Verma', age: 55, gender: 'MALE', phone: '9876543214' },
-  { name: 'Sai Kumar', age: 62, gender: 'MALE', phone: '9876543215' },
-  { name: 'Ayaan Reddy', age: 31, gender: 'MALE', phone: '9876543216' },
-  { name: 'Krishna Joshi', age: 40, gender: 'MALE', phone: '9876543217' },
-  { name: 'Ishaan Iyer', age: 25, gender: 'MALE', phone: '9876543218' },
-  { name: 'Shaurya Kapoor', age: 8, gender: 'MALE', phone: '9876543219' },
+  { name: 'Aarav Sharma', age: 34, gender: "MALE" as any, phone: '9876543210' },
+  { name: 'Vivaan Patel', age: 45, gender: "MALE" as any, phone: '9876543211' },
+  { name: 'Aditya Gupta', age: 28, gender: "MALE" as any, phone: '9876543212' },
+  { name: 'Vihaan Singh', age: 12, gender: "MALE" as any, phone: '9876543213' },
+  { name: 'Arjun Verma', age: 55, gender: "MALE" as any, phone: '9876543214' },
+  { name: 'Sai Kumar', age: 62, gender: "MALE" as any, phone: '9876543215' },
+  { name: 'Ayaan Reddy', age: 31, gender: "MALE" as any, phone: '9876543216' },
+  { name: 'Krishna Joshi', age: 40, gender: "MALE" as any, phone: '9876543217' },
+  { name: 'Ishaan Iyer', age: 25, gender: "MALE" as any, phone: '9876543218' },
+  { name: 'Shaurya Kapoor', age: 8, gender: "MALE" as any, phone: '9876543219' },
   { name: 'Diya Nair', age: 29, gender: 'FEMALE', phone: '9876543220' },
   { name: 'Ananya Rao', age: 37, gender: 'FEMALE', phone: '9876543221' },
   { name: 'Aadhya Menon', age: 50, gender: 'FEMALE', phone: '9876543222' },
@@ -101,7 +101,7 @@ const seedDatabase = async () => {
         name: p.name,
         mobileNumber: `+91${p.phone}`,
         age: p.age,
-        gender: p.gender,
+        gender: p.gender as any,
         address: 'Bangalore, Karnataka',
       }))
     );
@@ -118,8 +118,8 @@ const seedDatabase = async () => {
     for (let i = 0; i < 15; i++) {
       appointments.push({
         clinicId: clinic._id,
-        doctorId: doctors[i]._id,
-        patientId: patients[i]._id,
+        doctorId: (doctors[i] as any)._id,
+        patientId: (patients[i] as any)._id,
         appointmentDate: i % 2 === 0 ? todayStr : tomorrowStr,
         appointmentTime: `${10 + (i % 8)}:00`,
         status: i % 3 === 0 ? 'CONFIRMED' : (i % 4 === 0 ? 'COMPLETED' : 'PENDING'),

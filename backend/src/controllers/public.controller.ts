@@ -31,7 +31,7 @@ export const getClinicDetails = async (req: Request, res: Response, next: NextFu
   try {
     const { clinicId } = req.params;
     
-    const clinic = await findClinic(clinicId);
+    const clinic = await findClinic(clinicId as string);
     if (!clinic || clinic.status === 'SUSPENDED') {
       res.status(404).json({ success: false, message: 'Clinic not found or suspended.' });
       return;
@@ -60,7 +60,7 @@ export const getClinicDoctors = async (req: Request, res: Response, next: NextFu
   try {
     const { clinicId } = req.params;
     
-    const clinic = await findClinic(clinicId);
+    const clinic = await findClinic(clinicId as string);
     if (!clinic) {
       res.status(404).json({ success: false, message: 'Clinic not found' });
       return;
@@ -89,7 +89,7 @@ export const getBookedSlots = async (req: Request, res: Response, next: NextFunc
       return;
     }
 
-    const clinic = await findClinic(clinicId);
+    const clinic = await findClinic(clinicId as string);
     if (!clinic) {
       res.status(404).json({ success: false, message: 'Clinic not found' });
       return;
@@ -114,7 +114,7 @@ export const bookPublicAppointment = async (req: Request, res: Response, next: N
     const { clinicId } = req.params;
     const { doctorId, appointmentDate, appointmentTime, patientName, patientMobile, age, gender } = req.body;
 
-    const clinic = await findClinic(clinicId);
+    const clinic = await findClinic(clinicId as string);
     if (!clinic) {
       res.status(404).json({ success: false, message: 'Clinic not found' });
       return;

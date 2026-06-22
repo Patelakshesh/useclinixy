@@ -31,8 +31,8 @@ export const getCurrentSubscription = async (req: Request, res: Response, next: 
         data: {
           status: isTrial ? 'TRIAL' : 'NO_PLAN',
           plan: starterPlan,
-          currentPeriodStart: clinic?.createdAt,
-          currentPeriodEnd: new Date(clinic!.createdAt!.getTime() + 14 * 24 * 60 * 60 * 1000) // 14 days trial
+          currentPeriodStart: (clinic as any)?.createdAt,
+          currentPeriodEnd: new Date((clinic as any)!.createdAt!.getTime() + 14 * 24 * 60 * 60 * 1000) // 14 days trial
         } 
       });
       return;

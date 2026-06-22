@@ -94,23 +94,23 @@ export const createPlan = async (req: Request, res: Response, next: NextFunction
 
 export const updatePlan = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const plan = await SubscriptionPlan.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true, runValidators: true });
+    const plan = await SubscriptionPlan.findByIdAndUpdate((req.params.id as string), { $set: req.body }, { new: true, runValidators: true });
     if (!plan) { res.status(404).json({ success: false, message: 'Plan not found' }); return; }
-    logAudit((req as any).user.userId, 'PLAN_UPDATED', { planId: req.params.id, name: plan.name }, null, req.ip);
+    logAudit((req as any).user.userId, 'PLAN_UPDATED', { planId: (req.params.id as string), name: plan.name }, null, req.ip);
     res.status(200).json({ success: true, data: plan, message: 'Plan updated successfully' });
   } catch (error) { next(error); }
 };
 
 export const deletePlan = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const activeUsage = await Subscription.countDocuments({ planId: req.params.id, status: 'ACTIVE' });
+    const activeUsage = await Subscription.countDocuments({ planId: (req.params.id as string), status: 'ACTIVE' });
     if (activeUsage > 0) {
       res.status(400).json({ success: false, message: `Cannot delete: ${activeUsage} clinic(s) are currently on this plan.` });
       return;
     }
-    const plan = await SubscriptionPlan.findByIdAndDelete(req.params.id);
+    const plan = await SubscriptionPlan.findByIdAndDelete((req.params.id as string));
     if (!plan) { res.status(404).json({ success: false, message: 'Plan not found' }); return; }
-    logAudit((req as any).user.userId, 'PLAN_DELETED', { planId: req.params.id, name: plan.name }, null, req.ip);
+    logAudit((req as any).user.userId, 'PLAN_DELETED', { planId: (req.params.id as string), name: plan.name }, null, req.ip);
     res.status(200).json({ success: true, message: 'Plan deleted successfully' });
   } catch (error) { next(error); }
 };

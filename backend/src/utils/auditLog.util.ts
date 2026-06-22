@@ -16,7 +16,7 @@ export const logAudit = async (
       userId,
       action,
       details,
-      clinicId: clinicId || null,
+      clinicId: clinicId || undefined,
       ipAddress: ipAddress || 'unknown',
     });
   } catch (err) {
