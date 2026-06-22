@@ -57,14 +57,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] flex">
+    <div className="h-screen bg-slate-50 dark:bg-[#0A0A0A] flex overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
           <span className="text-xl font-bold text-white tracking-tight">Super Admin</span>
         </div>
         
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        <nav className="flex-1 min-h-0 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
           {navigation.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;

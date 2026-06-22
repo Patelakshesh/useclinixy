@@ -21,12 +21,12 @@ export const sendPasswordResetEmail = async (to: string, name: string, resetToke
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
       <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 32px 40px;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">ClinicSaaS</h1>
+        <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">Clinixy</h1>
       </div>
       <div style="padding: 40px;">
         <h2 style="color: #1e293b; font-size: 20px; font-weight: 600; margin: 0 0 12px;">Reset Your Password</h2>
         <p style="color: #64748b; font-size: 15px; line-height: 1.6; margin: 0 0 28px;">
-          Hi ${name}, we received a request to reset the password for your ClinicSaaS account.
+          Hi ${name}, we received a request to reset the password for your Clinixy account.
           Click the button below to choose a new password. This link expires in <strong>1 hour</strong>.
         </p>
         <a href="${resetUrl}" style="display: inline-block; background: #1e293b; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-size: 15px; font-weight: 600; letter-spacing: -0.2px;">
@@ -37,15 +37,15 @@ export const sendPasswordResetEmail = async (to: string, name: string, resetToke
         </p>
       </div>
       <div style="background: #f8fafc; padding: 20px 40px; border-top: 1px solid #e2e8f0;">
-        <p style="color: #94a3b8; font-size: 12px; margin: 0;">© ${new Date().getFullYear()} ClinicSaaS · All rights reserved</p>
+        <p style="color: #94a3b8; font-size: 12px; margin: 0;">© ${new Date().getFullYear()} Clinixy · All rights reserved</p>
       </div>
     </div>
   `;
 
   await transporter.sendMail({
-    from: `"ClinicSaaS" <${process.env.SMTP_USER}>`,
+    from: `"Clinixy" <${process.env.SMTP_USER}>`,
     to,
-    subject: 'Reset Your ClinicSaaS Password',
+    subject: 'Reset Your Clinixy Password',
     html,
   });
 };
@@ -56,10 +56,10 @@ export const sendWelcomeEmail = async (to: string, name: string, clinicName: str
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
       <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 32px 40px;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700;">ClinicSaaS</h1>
+        <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700;">Clinixy</h1>
       </div>
       <div style="padding: 40px;">
-        <h2 style="color: #1e293b; font-size: 20px; font-weight: 600; margin: 0 0 12px;">Welcome to ClinicSaaS! 🎉</h2>
+        <h2 style="color: #1e293b; font-size: 20px; font-weight: 600; margin: 0 0 12px;">Welcome to Clinixy! 🎉</h2>
         <p style="color: #64748b; font-size: 15px; line-height: 1.6; margin: 0 0 16px;">
           Hi ${name}, your clinic <strong>${clinicName}</strong> has been successfully registered.
           Your 14-day free trial has started — no credit card required.
@@ -75,9 +75,9 @@ export const sendWelcomeEmail = async (to: string, name: string, clinicName: str
   `;
 
   await transporter.sendMail({
-    from: `"ClinicSaaS" <${process.env.SMTP_USER}>`,
+    from: `"Clinixy" <${process.env.SMTP_USER}>`,
     to,
-    subject: `Welcome to ClinicSaaS — ${clinicName} is ready!`,
+    subject: `Welcome to Clinixy — ${clinicName} is ready!`,
     html,
   });
 };

@@ -4,6 +4,8 @@ import { Bell, Search, Calendar, Users, Stethoscope, Menu, Settings, Home, LogOu
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { getCurrentUser } from '@/features/auth/api/auth';
 
 interface HeaderProps {
   toggleSidebar?: () => void;
@@ -24,17 +26,24 @@ export const Header = ({ toggleSidebar }: HeaderProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: getCurrentUser,
+  });
+
   const allLinks = [
-    { title: 'Overview', href: '/dashboard', icon: Home },
-    { title: 'View Appointments', href: '/dashboard/appointments', icon: Calendar },
-    { title: 'Advanced Calendar', href: '/dashboard/calendar', icon: Calendar },
-    { title: 'Manage Doctors', href: '/dashboard/doctors', icon: Stethoscope },
-    { title: 'Patient Records', href: '/dashboard/patients', icon: Users },
-    { title: 'Billing & Subscriptions', href: '/dashboard/billing', icon: Settings },
-    { title: 'Account Settings', href: '/dashboard/settings', icon: Settings },
+    { title: 'Overview', href: '/dashboard', icon: Home, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+    { title: 'View Appointments', href: '/dashboard/appointments', icon: Calendar, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+    { title: 'Advanced Calendar', href: '/dashboard/calendar', icon: Calendar, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+    { title: 'Manage Doctors', href: '/dashboard/doctors', icon: Stethoscope, roles: ['CLINIC_ADMIN', 'RECEPTIONIST'] },
+    { title: 'Patient Records', href: '/dashboard/patients', icon: Users, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+    { title: 'Manage Staff', href: '/dashboard/staff', icon: Users, roles: ['CLINIC_ADMIN'] },
+    { title: 'Billing & Subscriptions', href: '/dashboard/billing', icon: Settings, roles: ['CLINIC_ADMIN'] },
+    { title: 'Account Settings', href: '/dashboard/settings', icon: Settings, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
   ];
 
-  const searchResults = allLinks.filter(link => link.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const allowedLinks = allLinks.filter(link => !user?.role || link.roles.includes(user.role));
+  const searchResults = allowedLinks.filter(link => link.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 sm:px-8 backdrop-blur-md dark:border-neutral-800 dark:bg-black/60 print:hidden">
@@ -93,10 +102,6 @@ export const Header = ({ toggleSidebar }: HeaderProps) => {
       </div>
 
       <div className="flex items-center gap-5">
-        <button className="relative text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-colors">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-slate-900 dark:bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
-        </button>
         <div className="h-8 w-8 cursor-pointer overflow-hidden rounded-full border border-slate-200 dark:border-neutral-800 ring-2 ring-transparent hover:ring-slate-200 dark:hover:ring-neutral-700 transition-all">
           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Avatar" className="h-full w-full object-cover bg-slate-100 dark:bg-neutral-900" />
         </div>

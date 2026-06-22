@@ -12,6 +12,9 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
     const clinicId = req.user?.clinicId as string;
     const appointment = await appointmentService.createAppointment(clinicId, req.body);
     
+    // Log the creation
+    logAudit(req.user?.userId!, 'APPOINTMENT_CREATED', { appointmentId: (appointment as any)._id, patientId: appointment.patientId }, clinicId, req.ip);
+
     // Send WhatsApp Message async (don't block response)
     (async () => {
       try {
@@ -61,7 +64,13 @@ export const getAppointments = async (req: Request, res: Response, next: NextFun
     const filter: any = {};
     if (req.query.date) filter.appointmentDate = req.query.date;
     if (req.query.status) filter.status = req.query.status;
-    if (req.query.doctorId) filter.doctorId = req.query.doctorId;
+
+    // RBAC: If logged in as Doctor, they can ONLY see their own appointments
+    if (req.user?.role === 'DOCTOR' && req.user?.doctorId) {
+      filter.doctorId = req.user.doctorId;
+    } else if (req.query.doctorId) {
+      filter.doctorId = req.query.doctorId;
+    }
 
     // Fix P2-3: Support patient name search via lookup
     let patientIdFilter: string[] | null = null;
@@ -117,7 +126,12 @@ export const getCalendarAppointments = async (req: Request, res: Response, next:
       return;
     }
 
-    const data = await appointmentService.getCalendarAppointments(clinicId, startDate, endDate, doctorId);
+    let finalDoctorId = doctorId;
+    if (req.user?.role === 'DOCTOR' && req.user?.doctorId) {
+      finalDoctorId = req.user.doctorId;
+    }
+
+    const data = await appointmentService.getCalendarAppointments(clinicId, startDate, endDate, finalDoctorId);
     res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
@@ -132,6 +146,9 @@ export const updateAppointmentStatus = async (req: Request, res: Response, next:
       res.status(404).json({ success: false, message: 'Appointment not found' });
       return;
     }
+
+    // Log the status update
+    logAudit(req.user?.userId!, `APPOINTMENT_${req.body.status}`, { appointmentId: (appointment as any)._id, patientId: appointment.patientId }, clinicId, req.ip);
 
     // Send WhatsApp Message async
     (async () => {
@@ -181,6 +198,9 @@ export const updateAppointment = async (req: Request, res: Response, next: NextF
       res.status(404).json({ success: false, message: 'Appointment not found' });
       return;
     }
+
+    logAudit(req.user?.userId!, 'APPOINTMENT_UPDATED', { appointmentId: (appointment as any)._id, patientId: appointment.patientId }, clinicId, req.ip);
+
     res.status(200).json({ success: true, data: appointment, message: 'Appointment updated successfully' });
   } catch (error: any) {
     if (error.message === 'Doctor is already booked for this time slot') {

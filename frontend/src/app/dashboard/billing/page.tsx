@@ -71,7 +71,7 @@ export default function BillingPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_dummy_key',
         amount: order.amount,
         currency: order.currency,
-        name: 'ClinicSaaS',
+        name: 'Clinixy',
         description: `Upgrade to ${plan.name} Plan`,
         order_id: order.id,
         handler: async (response: any) => {

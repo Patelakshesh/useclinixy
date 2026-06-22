@@ -30,6 +30,8 @@ export default function PublicBookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any>(null);
 
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
   useEffect(() => {
     const fetchClinicData = async () => {
       try {
@@ -38,7 +40,14 @@ export default function PublicBookingPage() {
           api.get(`/public/${clinicId}/doctors`)
         ]);
         setClinic(clinicRes.data.data);
-        setDoctors(doctorsRes.data.data);
+        const fetchedDoctors = doctorsRes.data.data;
+        setDoctors(fetchedDoctors);
+
+        // Smart UX: Auto-skip Step 1 if there is only 1 doctor
+        if (fetchedDoctors.length === 1) {
+          setSelectedDoctor(fetchedDoctors[0]);
+          setStep(2);
+        }
       } catch (err: any) {
         setError(err.response?.data?.message || 'Clinic not found or online booking is disabled.');
       } finally {
@@ -47,6 +56,25 @@ export default function PublicBookingPage() {
     };
     if (clinicId) fetchClinicData();
   }, [clinicId]);
+
+  // Fetch booked slots when doctor or date changes
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      if (!selectedDoctor || !selectedDate) return;
+      try {
+        const res = await api.get(`/public/${clinicId}/booked-slots`, {
+          params: {
+            doctorId: selectedDoctor._id,
+            date: format(selectedDate, 'yyyy-MM-dd')
+          }
+        });
+        setBookedSlots(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch booked slots', error);
+      }
+    };
+    fetchBookedSlots();
+  }, [selectedDoctor, selectedDate, clinicId]);
 
   if (loading) {
     return (
@@ -102,12 +130,28 @@ export default function PublicBookingPage() {
     if (!daySchedule || !daySchedule.isWorkingDay) return [];
 
     const slots: string[] = [];
+    const now = new Date();
+    const isToday = format(selectedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
     daySchedule.shifts.forEach((shift: any) => {
       // Very basic 30-min interval generator for the shift
       let current = new Date(`2000-01-01T${shift.startTime}`);
       const end = new Date(`2000-01-01T${shift.endTime}`);
       while (current < end) {
-        slots.push(format(current, 'HH:mm'));
+        const timeString = format(current, 'HH:mm');
+        
+        // Filter out past times if it's today
+        const slotMinutes = current.getHours() * 60 + current.getMinutes();
+        const isPast = isToday && slotMinutes <= currentMinutes;
+        
+        // Filter out already booked slots
+        const isBooked = bookedSlots.includes(timeString);
+
+        if (!isPast && !isBooked) {
+          slots.push(timeString);
+        }
+        
         current.setMinutes(current.getMinutes() + 30);
       }
     });
@@ -255,13 +299,23 @@ export default function PublicBookingPage() {
                 </div>
               )}
 
-              <button 
-                disabled={!selectedTime}
-                onClick={() => setStep(3)}
-                className="w-full mt-8 py-3 bg-slate-900 text-white dark:bg-white dark:text-black font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 dark:hover:bg-neutral-200 transition-colors"
-              >
-                Continue to Details
-              </button>
+              <div className="flex gap-3 mt-8">
+                {doctors.length > 1 && (
+                  <button 
+                    onClick={() => setStep(1)}
+                    className="w-1/3 py-3 bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-neutral-700 transition-colors"
+                  >
+                    Back
+                  </button>
+                )}
+                <button 
+                  disabled={!selectedTime}
+                  onClick={() => setStep(3)}
+                  className={`${doctors.length > 1 ? 'w-2/3' : 'w-full'} py-3 bg-slate-900 text-white dark:bg-white dark:text-black font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 dark:hover:bg-neutral-200 transition-colors`}
+                >
+                  Continue to Details
+                </button>
+              </div>
             </div>
           )}
 
@@ -275,7 +329,6 @@ export default function PublicBookingPage() {
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">with Dr. {selectedDoctor.name}</p>
                 </div>
-                <button onClick={() => setStep(2)} className="text-sm text-blue-600 hover:underline font-medium">Edit</button>
               </div>
 
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Patient Details</h2>
@@ -337,11 +390,18 @@ export default function PublicBookingPage() {
                   </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-4 flex gap-3">
+                  <button 
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="w-1/3 py-3 bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-neutral-700 transition-colors"
+                  >
+                    Back
+                  </button>
                   <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-2/3 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Confirm Booking'}
                   </button>
@@ -384,6 +444,13 @@ export default function PublicBookingPage() {
             </div>
           )}
 
+        </div>
+
+        {/* Viral Marketing Badge */}
+        <div className="mt-8 text-center animate-in fade-in duration-700 delay-300">
+          <a href="https://useclinixy.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600 dark:text-neutral-600 dark:hover:text-neutral-400 transition-colors">
+            Powered by <span className="text-slate-900 dark:text-white font-bold">Clinixy</span>
+          </a>
         </div>
       </main>
     </div>

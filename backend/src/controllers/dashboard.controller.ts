@@ -7,7 +7,7 @@ import Doctor from '../models/doctor.model';
 export const getDashboardStats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const stats = await dashboardService.getDashboardStats(clinicId);
+    const stats = await dashboardService.getDashboardStats(clinicId, req.user);
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
     next(error);
@@ -17,7 +17,7 @@ export const getDashboardStats = async (req: Request, res: Response, next: NextF
 export const getRecentActivities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const clinicId = req.user?.clinicId as string;
-    const activities = await dashboardService.getRecentActivities(clinicId);
+    const activities = await dashboardService.getRecentActivities(clinicId, req.user);
     res.status(200).json({ success: true, data: activities });
   } catch (error) {
     next(error);

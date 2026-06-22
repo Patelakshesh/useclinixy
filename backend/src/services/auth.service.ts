@@ -32,6 +32,7 @@ export const loginUser = async (email: string, password: string) => {
     userId: user._id.toString(),
     clinicId: user.clinicId ? user.clinicId.toString() : null,
     role: user.role,
+    doctorId: (user as any).doctorId ? (user as any).doctorId.toString() : null,
   });
 
   user.lastLogin = new Date();

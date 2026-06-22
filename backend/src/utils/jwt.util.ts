@@ -7,6 +7,7 @@ export interface JwtPayload {
   userId: string;
   clinicId: string | null;
   role: string;
+  doctorId?: string | null;
 }
 
 export const signToken = (payload: JwtPayload): string => {

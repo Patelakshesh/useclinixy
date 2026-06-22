@@ -79,6 +79,36 @@ export const getClinicDoctors = async (req: Request, res: Response, next: NextFu
   }
 };
 
+export const getBookedSlots = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { clinicId } = req.params;
+    const { doctorId, date } = req.query;
+
+    if (!doctorId || !date) {
+      res.status(400).json({ success: false, message: 'doctorId and date are required' });
+      return;
+    }
+
+    const clinic = await findClinic(clinicId);
+    if (!clinic) {
+      res.status(404).json({ success: false, message: 'Clinic not found' });
+      return;
+    }
+
+    const appointments = await Appointment.find({
+      clinicId: clinic._id,
+      doctorId: doctorId as string,
+      appointmentDate: date as string,
+      status: { $ne: 'CANCELLED' }
+    }).select('appointmentTime');
+
+    const bookedTimes = appointments.map(a => a.appointmentTime);
+    res.status(200).json({ success: true, data: bookedTimes });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const bookPublicAppointment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { clinicId } = req.params;

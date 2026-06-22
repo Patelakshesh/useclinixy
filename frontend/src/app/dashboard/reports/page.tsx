@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { clinicApi } from '@/lib/api';
+import { getReports } from '@/features/dashboard/api/dashboard';
 import { BarChart2, TrendingUp, Users, Calendar, Award } from 'lucide-react';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -13,13 +13,8 @@ const STATUS_COLORS: Record<string, string> = {
   NO_SHOW: 'bg-amber-500',
 };
 
-const fetchReports = async () => {
-  const res = await clinicApi.get('/dashboard/reports');
-  return res.data.data;
-};
-
 export default function ReportsPage() {
-  const { data, isLoading } = useQuery({ queryKey: ['clinicReports'], queryFn: fetchReports });
+  const { data, isLoading } = useQuery({ queryKey: ['clinicReports'], queryFn: getReports });
 
   if (isLoading) {
     return (

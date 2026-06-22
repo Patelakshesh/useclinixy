@@ -62,7 +62,7 @@ export default function RegisterClinic() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-blue-600 font-bold">
                 C
               </div>
-              <span className="text-xl font-bold tracking-tight">ClinicSaaS</span>
+              <span className="text-xl font-bold tracking-tight">Clinixy</span>
             </div>
             <h2 className="text-3xl font-bold mb-4">Start your 14-day free trial.</h2>
             <p className="text-blue-100 text-lg mb-8 leading-relaxed">
@@ -116,7 +116,7 @@ export default function RegisterClinic() {
                   />
                 </div>
                 {subdomain && !errors.subdomain && (
-                  <p className="text-[10px] text-green-600 dark:text-green-400 mt-1">Your portal: {subdomain}.clinicsaas.com</p>
+                  <p className="text-[10px] text-green-600 dark:text-green-400 mt-1">Your portal: useclinixy.vercel.app/booking/{subdomain}</p>
                 )}
                 {errors.subdomain && <p className="text-xs text-red-500 mt-1">{errors.subdomain.message}</p>}
               </div>

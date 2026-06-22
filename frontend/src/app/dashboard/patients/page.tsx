@@ -7,6 +7,8 @@ import { SlideOver } from '@/components/shared/SlideOver';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PatientForm } from '@/features/patients/components/PatientForm';
 import { Trash2, Edit, UserCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getCurrentUser } from '@/features/auth/api/auth';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
@@ -24,6 +26,9 @@ export default function PatientsPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: getCurrentUser });
+  const isDoctor = user?.role === 'DOCTOR';
 
   const fetchPatients = useCallback(async (page = 1, currentLimit = limit) => {
     setLoading(true);
@@ -101,12 +106,12 @@ export default function PatientsPage() {
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
         <DataTable 
           title="Patients"
-          columns={['Name', 'Age & Gender', 'Contact', 'Address', 'Actions']}
+          columns={isDoctor ? ['Name', 'Age & Gender', 'Contact', 'Address', 'Profile'] : ['Name', 'Age & Gender', 'Contact', 'Address', 'Actions']}
           data={data}
           loading={loading}
           onSearch={setSearch}
-          onAddClick={handleAddClick}
-          addButtonLabel="Add Patient"
+          onAddClick={isDoctor ? undefined : handleAddClick}
+          addButtonLabel={isDoctor ? undefined : "Add Patient"}
           pagination={pagination}
           onPageChange={(page) => fetchPatients(page, limit)}
           onLimitChange={(newLimit) => setLimit(newLimit)}
@@ -132,12 +137,16 @@ export default function PatientsPage() {
                    <Link href={`/dashboard/patients/${patient._id}`} className="text-slate-400 hover:text-indigo-500 transition-colors" title="View Profile">
                      <UserCircle className="h-4 w-4" />
                    </Link>
-                   <button onClick={() => handleEditClick(patient)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Edit">
-                     <Edit className="h-4 w-4" />
-                   </button>
-                   <button onClick={() => confirmDelete(patient._id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Delete">
-                     <Trash2 className="h-4 w-4" />
-                   </button>
+                   {!isDoctor && (
+                     <>
+                       <button onClick={() => handleEditClick(patient)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Edit">
+                         <Edit className="h-4 w-4" />
+                       </button>
+                       <button onClick={() => confirmDelete(patient._id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Delete">
+                         <Trash2 className="h-4 w-4" />
+                       </button>
+                     </>
+                   )}
                  </div>
               </td>
             </>

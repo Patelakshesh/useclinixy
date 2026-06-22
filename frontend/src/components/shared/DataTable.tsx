@@ -8,7 +8,7 @@ interface DataTableProps {
   data: any[];
   loading: boolean;
   onSearch: (value: string) => void;
-  onAddClick: () => void;
+  onAddClick?: () => void;
   addButtonLabel?: string;
   renderRow: (item: any) => React.ReactNode;
   pagination?: { page: number; pages: number; total: number; limit: number };
@@ -51,12 +51,14 @@ export const DataTable = ({ title, columns, data, loading, onSearch, onAddClick,
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h2>
-        <button
-          onClick={onAddClick}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none dark:bg-white dark:text-black dark:hover:bg-slate-200 transition-colors shadow-sm"
-        >
-          {addButtonLabel}
-        </button>
+        {onAddClick && (
+          <button
+            onClick={onAddClick}
+            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none dark:bg-white dark:text-black dark:hover:bg-slate-200 transition-colors shadow-sm"
+          >
+            {addButtonLabel}
+          </button>
+        )}
       </div>
 
       <div className="flex items-center justify-between rounded-t-xl border-b border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-black">

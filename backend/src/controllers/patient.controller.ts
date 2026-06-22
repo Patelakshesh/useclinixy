@@ -61,6 +61,7 @@ export const updatePatient = async (req: Request, res: Response, next: NextFunct
       res.status(404).json({ success: false, message: 'Patient not found' });
       return;
     }
+    logAudit(req.user?.userId!, 'PATIENT_UPDATED', { patientId: (patient as any)._id, name: (patient as any).name }, clinicId, req.ip);
     res.status(200).json({ success: true, data: patient, message: 'Patient updated successfully' });
   } catch (error) {
     next(error);

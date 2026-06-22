@@ -8,14 +8,15 @@ import { logoutUser, getCurrentUser } from '@/features/auth/api/auth';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const navItems = [
-  { name: 'Overview', href: '/dashboard', icon: Home },
-  { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
-  { name: 'Appointments', href: '/dashboard/appointments', icon: Calendar },
-  { name: 'Doctors', href: '/dashboard/doctors', icon: Stethoscope },
-  { name: 'Patients', href: '/dashboard/patients', icon: Users },
-  { name: 'Reports', href: '/dashboard/reports', icon: BarChart2 },
-  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Overview', href: '/dashboard', icon: Home, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+  { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+  { name: 'Appointments', href: '/dashboard/appointments', icon: Calendar, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+  { name: 'Doctors', href: '/dashboard/doctors', icon: Stethoscope, roles: ['CLINIC_ADMIN', 'RECEPTIONIST'] },
+  { name: 'Patients', href: '/dashboard/patients', icon: Users, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+  { name: 'Staff', href: '/dashboard/staff', icon: Users, roles: ['CLINIC_ADMIN'] },
+  { name: 'Reports', href: '/dashboard/reports', icon: BarChart2, roles: ['CLINIC_ADMIN'] },
+  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard, roles: ['CLINIC_ADMIN'] },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings, roles: ['CLINIC_ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
 ];
 
 interface SidebarProps {
@@ -51,14 +52,14 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 dark:from-white dark:to-slate-200 text-white dark:text-black font-bold shadow-sm text-xs">
           C
         </div>
-        <span className="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">ClinicSaaS</span>
+        <span className="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">Clinixy</span>
       </div>
 
-      <div className="flex-1 px-3 overflow-y-auto">
+      <div className="flex-1 min-h-0 px-3 overflow-y-auto custom-scrollbar pb-4">
          <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-neutral-500 mb-2">Menu</p>
          <nav className="space-y-0.5">
            <LayoutGroup>
-             {navItems.map((item) => {
+             {navItems.filter(item => !user?.role || item.roles.includes(user.role)).map((item) => {
                const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(`${item.href}`));
                return (
                  <Link key={item.name} href={item.href} onClick={() => setIsOpen(false)} className="relative block group">

@@ -10,6 +10,7 @@ import adminRoutes from './admin.routes';
 import subscriptionRoutes from './subscription.routes';
 import paymentRoutes from './payment.routes';
 import publicRoutes from './public.routes';
+import staffRoutes from './staff.routes';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use('/admin', adminRoutes);
 router.use('/subscriptions', subscriptionRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/public', publicRoutes);
+router.use('/staff', staffRoutes);
 
 export default router;

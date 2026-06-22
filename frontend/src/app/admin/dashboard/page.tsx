@@ -80,7 +80,7 @@ export default function AdminDashboard() {
                     <div className="text-xs text-slate-500 dark:text-neutral-400">{clinic.email}</div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600 dark:text-neutral-300">
-                    {clinic.subdomain}.clinicsaas.com
+                    useclinixy.vercel.app/booking/{clinic.subdomain}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600 dark:text-neutral-300">
                     <span className="font-medium">{clinic.subscriptionId?.planId?.name || 'Free Trial'}</span>

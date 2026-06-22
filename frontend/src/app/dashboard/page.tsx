@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { getDashboardStats, getRecentActivities } from '@/features/dashboard/api/dashboard';
-import { Users, Stethoscope, Calendar, Clock, ArrowUpRight, TrendingUp, Plus, UserPlus, CalendarPlus, Activity } from 'lucide-react';
+import { Users, Stethoscope, Calendar, Clock, ArrowUpRight, TrendingUp, Plus, UserPlus, CalendarPlus, Activity, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
+import { getCurrentUser } from '@/features/auth/api/auth';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
 export default function DashboardPage() {
+  const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: getCurrentUser });
   const [stats, setStats] = useState({
     totalDoctors: 0,
     totalPatients: 0,
@@ -80,10 +83,12 @@ export default function DashboardPage() {
              <ArrowUpRight className="h-4 w-4 text-slate-400 dark:text-neutral-500" />
              Export
            </button>
-           <Link href="/dashboard/appointments" className="flex-1 sm:flex-none justify-center flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 sm:py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-95">
-             <Plus className="h-4 w-4" />
-             Booking
-           </Link>
+           {user?.role !== 'DOCTOR' && (
+             <Link href="/dashboard/appointments" className="flex-1 sm:flex-none justify-center flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 sm:py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-95">
+               <Plus className="h-4 w-4" />
+               Booking
+             </Link>
+           )}
         </div>
       </div>
 
@@ -203,7 +208,7 @@ export default function DashboardPage() {
                   activities.slice(0, 5).map((act) => (
                     <div key={act.id} className="flex items-start gap-4 group">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-50 dark:bg-neutral-800/50 text-slate-500 dark:text-neutral-400 border border-slate-100 dark:border-neutral-800">
-                         {act.type === 'APPOINTMENT' ? <Calendar className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                         {act.type === 'APPOINTMENT' ? <Calendar className="w-4 h-4" /> : act.type === 'STAFF' ? <Shield className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
                       </div>
                       <div className="flex-1 min-w-0 pt-1">
                          <p className="text-sm text-slate-700 dark:text-neutral-300 leading-tight">
@@ -228,33 +233,61 @@ export default function DashboardPage() {
         transition={{ delay: 0.5, duration: 0.5 }}
         className="grid grid-cols-1 sm:grid-cols-3 gap-4"
       >
-         <Link href="/dashboard/patients" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-               <UserPlus className="h-5 w-5" />
-            </div>
-            <div>
-               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Register Patient</h3>
-               <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Add a new patient record</p>
-            </div>
-         </Link>
-         <Link href="/dashboard/appointments" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-               <CalendarPlus className="h-5 w-5" />
-            </div>
-            <div>
-               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Book Appointment</h3>
-               <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Schedule a new visit</p>
-            </div>
-         </Link>
-         <Link href="/dashboard/doctors" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
-               <Plus className="h-5 w-5" />
-            </div>
-            <div>
-               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Add Doctor</h3>
-               <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Onboard medical staff</p>
-            </div>
-         </Link>
+         {user?.role !== 'DOCTOR' ? (
+           <>
+             <Link href="/dashboard/patients" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                   <UserPlus className="h-5 w-5" />
+                </div>
+                <div>
+                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Register Patient</h3>
+                   <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Add a new patient record</p>
+                </div>
+             </Link>
+             <Link href="/dashboard/appointments" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                   <CalendarPlus className="h-5 w-5" />
+                </div>
+                <div>
+                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Book Appointment</h3>
+                   <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Schedule a new visit</p>
+                </div>
+             </Link>
+           </>
+         ) : (
+           <>
+             <Link href="/dashboard/patients" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                   <Users className="h-5 w-5" />
+                </div>
+                <div>
+                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">View Patients</h3>
+                   <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Browse patient records</p>
+                </div>
+             </Link>
+             <Link href="/dashboard/calendar" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                   <Calendar className="h-5 w-5" />
+                </div>
+                <div>
+                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">My Schedule</h3>
+                   <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">View today's appointments</p>
+                </div>
+             </Link>
+           </>
+         )}
+         
+         {user?.role === 'CLINIC_ADMIN' && (
+           <Link href="/dashboard/doctors" className="flex items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm hover:shadow-md dark:border-neutral-800/80 dark:bg-[#0A0A0A] hover:border-slate-300 dark:hover:border-neutral-700 transition-all group">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+                 <Plus className="h-5 w-5" />
+              </div>
+              <div>
+                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Add Doctor</h3>
+                 <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Onboard medical staff</p>
+              </div>
+           </Link>
+         )}
       </motion.div>
     </div>
   );

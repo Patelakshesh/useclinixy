@@ -15,8 +15,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ClinicSaaS - Advanced Clinic Management',
-  description: 'A comprehensive doctor appointment and clinic management platform.',
+  title: 'Clinixy - The Modern Medical Clinic Management Platform',
+  description: 'Clinixy is the ultimate SaaS platform for doctors and medical clinics. Automate appointment scheduling, patient management, staff coordination, and billing all in one place.',
+  keywords: 'doctor appointment software, clinic management system, medical practice software, online booking for doctors, healthcare SaaS, Clinixy, patient scheduling, medical CRM',
+  authors: [{ name: 'Clinixy' }],
+  creator: 'Clinixy',
+  publisher: 'Clinixy',
+  openGraph: {
+    title: 'Clinixy - Advanced Medical Clinic Management',
+    description: 'Automate your medical clinic with Clinixy. Effortless online patient booking, smart doctor scheduling, and complete practice management.',
+    url: 'https://useclinixy.vercel.app',
+    siteName: 'Clinixy',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Clinixy - The Modern Medical Clinic Platform',
+    description: 'Transform your medical practice with smart patient scheduling and clinic management.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({

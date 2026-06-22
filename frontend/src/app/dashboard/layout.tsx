@@ -1,15 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { getCurrentUser } from '@/features/auth/api/auth';
 
+// Define allowed routes for each role
+const ROLE_ROUTES: Record<string, string[]> = {
+  CLINIC_ADMIN: ['/dashboard', '/dashboard/calendar', '/dashboard/appointments', '/dashboard/doctors', '/dashboard/patients', '/dashboard/reports', '/dashboard/billing', '/dashboard/settings', '/dashboard/staff'],
+  DOCTOR: ['/dashboard', '/dashboard/calendar', '/dashboard/appointments', '/dashboard/patients', '/dashboard/settings'],
+  RECEPTIONIST: ['/dashboard', '/dashboard/calendar', '/dashboard/appointments', '/dashboard/doctors', '/dashboard/patients', '/dashboard/settings'],
+};
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['currentUser'],
@@ -21,11 +29,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!isLoading) {
       if (!user) {
         router.push('/login');
-      } else if (user.role === 'SUPER_ADMIN') {
+        return;
+      }
+      
+      if (user.role === 'SUPER_ADMIN') {
         router.push('/admin/dashboard');
+        return;
+      }
+
+      // Check if the user is allowed to access the current route
+      const allowedRoutes = ROLE_ROUTES[user.role as string] || [];
+      const isAllowed = allowedRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
+      
+      if (!isAllowed) {
+        // Redirect to dashboard overview if they try to access an unauthorized page
+        router.push('/dashboard');
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, router, pathname]);
 
   if (isLoading || !user || user.role === 'SUPER_ADMIN') {
     return (

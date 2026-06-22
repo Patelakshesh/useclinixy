@@ -80,8 +80,8 @@ export default function AdminClinics() {
                     <div className="font-medium text-slate-900 dark:text-white flex items-center gap-2">
                       {clinic.name}
                     </div>
-                    <a href={`https://${clinic.subdomain}.clinicsaas.com`} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-0.5">
-                      {clinic.subdomain}.clinicsaas.com
+                    <a href={`https://useclinixy.vercel.app/booking/${clinic.subdomain}`} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-0.5">
+                      useclinixy.vercel.app/booking/{clinic.subdomain}
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </td>

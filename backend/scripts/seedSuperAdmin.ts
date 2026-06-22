@@ -11,7 +11,7 @@ const seedSuperAdmin = async () => {
     await mongoose.connect(mongoUri);
     console.log('Connected to MongoDB');
 
-    const adminExists = await User.findOne({ email: 'superadmin@clinicsaas.com' });
+    const adminExists = await User.findOne({ email: 'superadmin@clinixy.com' });
     if (adminExists) {
       console.log('Super admin already exists');
       process.exit(0);
@@ -22,7 +22,7 @@ const seedSuperAdmin = async () => {
 
     await User.create({
       name: 'Super Admin',
-      email: 'superadmin@clinicsaas.com',
+      email: 'superadmin@clinixy.com',
       password: passwordHash,
       role: 'SUPER_ADMIN',
       clinicId: null, // Global access
