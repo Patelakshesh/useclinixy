@@ -11,8 +11,8 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     // Set HTTP-only cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -35,7 +35,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
 export const logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    res.clearCookie('token');
+    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'none' });
     res.status(200).json({ success: true, message: 'Logged out successfully' });
   } catch (error) {
     next(error);

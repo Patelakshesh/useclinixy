@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -9,7 +9,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
     
     // Server-side fetch to get the clinic name for SEO
-    const res = await fetch(`${apiUrl}/public/${params.slug}`, { 
+    const resolvedParams = await params;
+    const res = await fetch(`${apiUrl}/public/${resolvedParams.slug}`, { 
       next: { revalidate: 60 } // Cache for 60 seconds
     });
     
