@@ -13,6 +13,23 @@ const STATUS_COLORS: Record<string, string> = {
   NO_SHOW: 'bg-amber-500',
 };
 
+// Helper to fill missing months for the last 6 months
+const fillLast6Months = (data: any[], valueKey: string) => {
+  const result = [];
+  const today = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const m = d.getMonth() + 1;
+    const y = d.getFullYear();
+    const found = data.find((x: any) => x._id.month === m && x._id.year === y);
+    result.push({
+      _id: { month: m, year: y },
+      [valueKey]: found ? found[valueKey] : 0,
+    });
+  }
+  return result;
+};
+
 export default function ReportsPage() {
   const { data, isLoading } = useQuery({ queryKey: ['clinicReports'], queryFn: getReports });
 
@@ -24,13 +41,16 @@ export default function ReportsPage() {
     );
   }
 
-  const trend = data?.appointmentTrend || [];
+  const rawTrend = data?.appointmentTrend || [];
   const topDoctors = data?.topDoctors || [];
   const statusBreakdown = data?.statusBreakdown || [];
-  const patientGrowth = data?.patientGrowth || [];
+  const rawPatientGrowth = data?.patientGrowth || [];
 
-  const maxTrend = Math.max(...trend.map((t: any) => t.total), 1);
-  const maxPatient = Math.max(...patientGrowth.map((p: any) => p.newPatients), 1);
+  const trend = fillLast6Months(rawTrend, 'total');
+  const patientGrowth = fillLast6Months(rawPatientGrowth, 'newPatients');
+
+  const maxTrend = Math.max(...trend.map((t: any) => t.total), 10);
+  const maxPatient = Math.max(...patientGrowth.map((p: any) => p.newPatients), 10);
   const totalStatusCount = statusBreakdown.reduce((s: number, r: any) => s + r.count, 0);
 
   return (
@@ -46,29 +66,35 @@ export default function ReportsPage() {
           <BarChart2 className="w-5 h-5 text-blue-500" />
           <h3 className="font-semibold text-slate-900 dark:text-white">Appointment Trend (Last 6 Months)</h3>
         </div>
-        {trend.length === 0 ? (
-          <p className="text-center text-slate-400 dark:text-neutral-500 py-8">No appointment data yet.</p>
-        ) : (
-          <div className="flex items-end gap-3 h-40">
+        
+        <div className="relative">
+          {/* Horizontal Grid Lines */}
+          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none" style={{ height: '120px' }}>
+            <div className="w-full border-t border-dashed border-slate-200 dark:border-neutral-800" />
+            <div className="w-full border-t border-dashed border-slate-200 dark:border-neutral-800" />
+            <div className="w-full border-t border-dashed border-slate-200 dark:border-neutral-800" />
+            <div className="w-full border-t border-slate-200 dark:border-neutral-800" />
+          </div>
+
+          <div className="relative flex justify-around items-end gap-3 h-40 pt-4">
             {trend.map((t: any, i: number) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              <div key={i} className="flex flex-col items-center gap-1 w-full max-w-[60px] z-10">
                 <div className="w-full flex flex-col gap-0.5" style={{ height: '120px', justifyContent: 'flex-end' }}>
                   <div
-                    className="w-full bg-blue-500 rounded-t-md transition-all duration-500"
-                    style={{ height: `${(t.total / maxTrend) * 100}%` }}
+                    className="w-full bg-blue-500 rounded-t-sm transition-all duration-500"
+                    style={{ height: `${Math.max((t.total / maxTrend) * 100, 2)}%`, minHeight: t.total === 0 ? '2px' : 'auto' }}
                     title={`Total: ${t.total}`}
                   />
                 </div>
-                <span className="text-xs text-slate-400 dark:text-neutral-500">{MONTH_NAMES[t._id.month - 1]}</span>
+                <span className="text-xs text-slate-400 dark:text-neutral-500 mt-1">{MONTH_NAMES[t._id.month - 1]}</span>
                 <span className="text-xs font-semibold text-slate-700 dark:text-neutral-300">{t.total}</span>
               </div>
             ))}
           </div>
-        )}
+        </div>
+
         <div className="flex gap-4 mt-4 text-xs text-slate-500 dark:text-neutral-400">
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500 inline-block" /> Total</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-green-500 inline-block" /> Completed</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block" /> Cancelled</span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500 inline-block" /> Total Appointments</span>
         </div>
       </div>
 
@@ -84,12 +110,12 @@ export default function ReportsPage() {
               <div key={s._id}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-slate-600 dark:text-neutral-400">{s._id}</span>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-white">{s.count} ({Math.round((s.count / totalStatusCount) * 100)}%)</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">{s.count} ({totalStatusCount > 0 ? Math.round((s.count / totalStatusCount) * 100) : 0}%)</span>
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-neutral-800 rounded-full h-2">
                   <div
                     className={`h-2 rounded-full ${STATUS_COLORS[s._id] || 'bg-slate-400'} transition-all duration-700`}
-                    style={{ width: `${(s.count / totalStatusCount) * 100}%` }}
+                    style={{ width: `${totalStatusCount > 0 ? (s.count / totalStatusCount) * 100 : 0}%` }}
                   />
                 </div>
               </div>
@@ -128,25 +154,31 @@ export default function ReportsPage() {
           <TrendingUp className="w-5 h-5 text-green-500" />
           <h3 className="font-semibold text-slate-900 dark:text-white">New Patients Per Month</h3>
         </div>
-        {patientGrowth.length === 0 ? (
-          <p className="text-center text-slate-400 dark:text-neutral-500 py-8">No patient data yet.</p>
-        ) : (
-          <div className="flex items-end gap-3 h-32">
+        
+        <div className="relative">
+          {/* Horizontal Grid Lines */}
+          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none" style={{ height: '80px' }}>
+            <div className="w-full border-t border-dashed border-slate-200 dark:border-neutral-800" />
+            <div className="w-full border-t border-dashed border-slate-200 dark:border-neutral-800" />
+            <div className="w-full border-t border-slate-200 dark:border-neutral-800" />
+          </div>
+
+          <div className="relative flex justify-around items-end gap-3 h-32 pt-4">
             {patientGrowth.map((p: any, i: number) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              <div key={i} className="flex flex-col items-center gap-1 w-full max-w-[60px] z-10">
                 <div className="w-full" style={{ height: '80px', display: 'flex', alignItems: 'flex-end' }}>
                   <div
-                    className="w-full bg-green-500 rounded-t-md transition-all duration-500"
-                    style={{ height: `${(p.newPatients / maxPatient) * 100}%` }}
+                    className="w-full bg-green-500 rounded-t-sm transition-all duration-500"
+                    style={{ height: `${Math.max((p.newPatients / maxPatient) * 100, 2)}%`, minHeight: p.newPatients === 0 ? '2px' : 'auto' }}
                     title={`New: ${p.newPatients}`}
                   />
                 </div>
-                <span className="text-xs text-slate-400 dark:text-neutral-500">{MONTH_NAMES[p._id.month - 1]}</span>
+                <span className="text-xs text-slate-400 dark:text-neutral-500 mt-1">{MONTH_NAMES[p._id.month - 1]}</span>
                 <span className="text-xs font-semibold text-slate-700 dark:text-neutral-300">{p.newPatients}</span>
               </div>
             ))}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

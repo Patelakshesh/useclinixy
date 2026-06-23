@@ -55,9 +55,9 @@ export const LoginForm = () => {
       } else {
         router.push('/dashboard');
       }
+      // DO NOT setIsLoading(false) here, so the button stays spinning until Next.js unmounts the page
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to login');
-    } finally {
       setIsLoading(false);
     }
   };
