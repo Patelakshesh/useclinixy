@@ -1,14 +1,14 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Building2, CreditCard, ShieldAlert, LogOut, Tag } from 'lucide-react';
+import { LayoutDashboard, Building2, CreditCard, ShieldAlert, LogOut, Tag, Menu } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentUser, logoutUser } from '@/features/auth/api/auth';
-import { useEffect } from 'react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
@@ -57,9 +57,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="h-screen bg-slate-50 dark:bg-[#0A0A0A] flex overflow-hidden">
+    <div className="h-[100dvh] bg-slate-50 dark:bg-[#0A0A0A] flex overflow-hidden w-full relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col">
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static`}>
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
           <span className="text-xl font-bold text-white tracking-tight">Super Admin</span>
         </div>
@@ -73,6 +81,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => setIsSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive 
                     ? 'bg-slate-800 text-white' 
@@ -98,10 +107,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden w-full relative">
         {/* Header */}
-        <header className="h-16 bg-white dark:bg-[#111] border-b border-slate-200 dark:border-neutral-800 flex items-center px-6 justify-between shrink-0">
-          <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Global Administration</h1>
+        <header className="h-16 bg-white dark:bg-[#111] border-b border-slate-200 dark:border-neutral-800 flex items-center px-4 md:px-6 justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="md:hidden p-2 -ml-2 text-slate-600 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <h1 className="text-lg font-semibold text-slate-900 dark:text-white hidden sm:block">Global Administration</h1>
+          </div>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
               SA
