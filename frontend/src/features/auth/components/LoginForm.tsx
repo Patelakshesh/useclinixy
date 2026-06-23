@@ -23,6 +23,14 @@ export const LoginForm = () => {
     retry: false
   });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
   if (!isUserLoading && user) {
     if (user.role === 'SUPER_ADMIN') {
       router.push('/admin/dashboard');
@@ -36,14 +44,6 @@ export const LoginForm = () => {
       </div>
     );
   }
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
