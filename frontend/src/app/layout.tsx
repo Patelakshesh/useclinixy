@@ -34,6 +34,9 @@ export const metadata: Metadata = {
     title: 'Clinixy - The Modern Medical Clinic Platform',
     description: 'Transform your medical practice with smart patient scheduling and clinic management.',
   },
+  verification: {
+    google: '7IUFSXsW-JniYCpIOg4zlNdtlMyafi7arRBJiw8G2-4',
+  },
   robots: {
     index: true,
     follow: true,
