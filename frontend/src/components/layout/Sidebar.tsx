@@ -36,6 +36,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
   const handleLogout = async () => {
     try {
+      localStorage.removeItem('token');
       await logoutUser();
       queryClient.removeQueries({ queryKey: ['currentUser'] });
     } catch (error) {
@@ -47,7 +48,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   };
 
   return (
-    <aside className={`fixed left-0 top-0 z-40 h-[100dvh] w-64 border-r border-slate-200/60 bg-[#FAFAFA] dark:border-neutral-800/60 dark:bg-[#050505] transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 flex flex-col print:hidden`}>
+    <aside className={`fixed left-0 inset-y-0 z-40 w-64 border-r border-slate-200/60 bg-[#FAFAFA] dark:border-neutral-800/60 dark:bg-[#050505] transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 flex flex-col print:hidden`}>
       <div className="flex items-center gap-3 px-6 py-6 mb-4">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 dark:from-white dark:to-slate-200 text-white dark:text-black font-bold shadow-sm text-xs">
           C

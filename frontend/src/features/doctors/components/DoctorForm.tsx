@@ -23,7 +23,7 @@ export const DoctorForm = ({ onSubmit, defaultValues, loading }: any) => {
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Name <span className="text-red-500">*</span></label>
         <input placeholder="Dr. John Doe" {...register('name')} className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-[#1A1A1A] dark:text-white outline-none focus:border-slate-400 dark:focus:border-neutral-600 transition-colors" />
@@ -67,10 +67,15 @@ export const DoctorForm = ({ onSubmit, defaultValues, loading }: any) => {
         Note: You can configure the doctor's detailed working hours, shifts, and leaves from the main Doctors list by clicking the "Manage Schedule" action.
       </div>
 
-      <div className="pt-4">
-        <button type="submit" disabled={loading} className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-slate-200 transition-colors">
+      <div className="pt-4 flex gap-3">
+        <button type="button" onClick={handleSubmit((data) => onSubmit(data, false))} disabled={loading} className="flex-1 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-slate-200 transition-colors">
           {loading ? 'Saving...' : 'Save Doctor'}
         </button>
+        {!defaultValues && (
+          <button type="button" onClick={handleSubmit((data) => onSubmit(data, true))} disabled={loading} className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-neutral-700 dark:bg-[#1A1A1A] dark:text-neutral-300 dark:hover:bg-neutral-800 transition-colors">
+            {loading ? 'Saving...' : 'Save & Add Schedule'}
+          </button>
+        )}
       </div>
     </form>
   );

@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
+import { Controller } from 'react-hook-form';
+import CreatableSelect from 'react-select/creatable';
 import { getDoctors } from '@/features/doctors/api/doctors';
 import { getPatients } from '@/features/patients/api/patients';
 
@@ -16,16 +18,33 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export const AppointmentForm = ({ onSubmit, defaultValues, loading }: any) => {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues });
+export const AppointmentForm = ({ onSubmit, defaultValues, loading, onCreateNewPatient, newPatientAdded }: any) => {
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues });
   
   const [doctors, setDoctors] = useState([]);
-  const [patients, setPatients] = useState([]);
+  const [patients, setPatients] = useState<any[]>([]);
 
   useEffect(() => {
     getDoctors('', 1, 1000).then(res => setDoctors(res.data));
+  }, []);
+
+  useEffect(() => {
     getPatients('', 1, 1000).then(res => setPatients(res.data));
   }, []);
+
+  useEffect(() => {
+    if (newPatientAdded) {
+      getPatients('', 1, 1000).then(res => {
+        setPatients(res.data);
+        setValue('patientId', newPatientAdded._id, { shouldValidate: true });
+      });
+    }
+  }, [newPatientAdded, setValue]);
+
+  const patientOptions = patients.map((p: any) => ({
+    value: p._id,
+    label: `${p.name} (${p.mobileNumber})`
+  }));
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -39,10 +58,40 @@ export const AppointmentForm = ({ onSubmit, defaultValues, loading }: any) => {
       </div>
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Patient <span className="text-red-500">*</span></label>
-        <select {...register('patientId')} className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-[#1A1A1A] dark:text-white outline-none focus:border-slate-400 dark:focus:border-neutral-600">
-           <option value="">Select Patient</option>
-           {patients.map((p: any) => <option key={p._id} value={p._id}>{p.name} ({p.mobileNumber})</option>)}
-        </select>
+        <Controller
+          name="patientId"
+          control={control}
+          render={({ field }) => (
+            <CreatableSelect
+              {...field}
+              isClearable
+              options={patientOptions}
+              value={patientOptions.find(o => o.value === field.value) || null}
+              onChange={(selected: any) => field.onChange(selected ? selected.value : '')}
+              onCreateOption={(inputValue) => {
+                if (onCreateNewPatient) onCreateNewPatient(inputValue);
+              }}
+              placeholder="Search or type to create new patient..."
+              formatCreateLabel={(inputValue) => `Create new patient: "${inputValue}"`}
+              className="text-sm react-select-container"
+              classNamePrefix="react-select"
+              classNames={{
+                control: ({ isFocused }) => 
+                  `!bg-slate-50 dark:!bg-[#1A1A1A] !border !border-slate-200 dark:!border-neutral-800 !min-h-[38px] !rounded-md !shadow-none ${isFocused ? '!border-slate-400 dark:!border-neutral-600' : ''}`,
+                menu: () => `!bg-white dark:!bg-[#1A1A1A] !border !border-slate-200 dark:!border-neutral-800 !shadow-lg !rounded-md !mt-1`,
+                menuList: () => `!p-1`,
+                option: ({ isFocused, isSelected }) => 
+                  `!cursor-pointer !text-sm !rounded-sm !py-2 !px-3 ${isSelected ? '!bg-blue-600 !text-white' : isFocused ? '!bg-slate-100 dark:!bg-neutral-800 !text-slate-900 dark:!text-white' : '!bg-transparent !text-slate-700 dark:!text-slate-200'}`,
+                singleValue: () => `!text-slate-900 dark:!text-white`,
+                input: () => `!text-slate-900 dark:!text-white`,
+                placeholder: () => `!text-slate-400 dark:!text-slate-500`,
+                indicatorSeparator: () => `!bg-slate-200 dark:!bg-neutral-800`,
+                dropdownIndicator: () => `!text-slate-400 dark:!text-slate-500 hover:!text-slate-600 dark:hover:!text-slate-300`,
+                clearIndicator: () => `!text-slate-400 dark:!text-slate-500 hover:!text-slate-600 dark:hover:!text-slate-300`
+              }}
+            />
+          )}
+        />
         {errors.patientId && <span className="text-xs text-red-500 mt-1">{errors.patientId.message}</span>}
       </div>
       <div className="grid grid-cols-2 gap-4">

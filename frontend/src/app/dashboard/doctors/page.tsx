@@ -49,18 +49,28 @@ export default function DoctorsPage() {
     return () => clearTimeout(delayDebounceFn);
   }, [search, limit, fetchDoctors]);
 
-  const handleSubmitForm = async (formData: any) => {
+  const handleSubmitForm = async (formData: any, openScheduleNext: boolean = false) => {
     setFormLoading(true);
     try {
       if (editData) {
         await updateDoctor(editData._id, formData);
         toast.success('Doctor updated successfully');
+        setIsDrawerOpen(false);
+        fetchDoctors(pagination.page);
       } else {
-        await createDoctor(formData);
+        const res = await createDoctor(formData);
         toast.success('Doctor added successfully');
+        setIsDrawerOpen(false);
+        fetchDoctors(pagination.page);
+        
+        if (openScheduleNext && res.data) {
+          // Add a tiny delay to ensure drawer closing animation doesn't conflict
+          setTimeout(() => {
+            setScheduleDoctor(res.data);
+            setIsScheduleOpen(true);
+          }, 300);
+        }
       }
-      setIsDrawerOpen(false);
-      fetchDoctors(pagination.page);
     } catch (error: any) {
       console.error(error);
       const backendMessage = error.response?.data?.message;
@@ -145,8 +155,22 @@ export default function DoctorsPage() {
               </td>
               <td className="px-6 py-4">
                  <div className="flex items-center gap-3">
-                   <button onClick={() => handleScheduleClick(doc)} className="text-slate-400 hover:text-indigo-500 transition-colors" title="Manage Schedule">
+                   <button 
+                     onClick={() => handleScheduleClick(doc)} 
+                     className={`relative text-slate-400 hover:text-indigo-500 transition-colors ${!doc.schedule?.some((s:any) => s.isWorkingDay) ? 'text-orange-400' : ''}`} 
+                     title="Manage Schedule"
+                   >
                      <CalendarClock className="h-4 w-4" />
+                     {!doc.schedule?.some((s:any) => s.isWorkingDay) ? (
+                       <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                         <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                       </span>
+                     ) : (
+                       <span className="absolute -top-0.5 -right-0.5 flex h-1.5 w-1.5">
+                         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                       </span>
+                     )}
                    </button>
                    <button onClick={() => handleEditClick(doc)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Edit">
                      <Edit className="h-4 w-4" />

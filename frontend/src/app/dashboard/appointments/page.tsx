@@ -5,6 +5,7 @@ import { getAppointments, createAppointment, updateAppointmentStatus, updateAppo
 import { DataTable } from '@/components/shared/DataTable';
 import { SlideOver } from '@/components/shared/SlideOver';
 import { AppointmentForm } from '@/features/appointments/components/AppointmentForm';
+import { PatientForm } from '@/features/patients/components/PatientForm';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useQuery } from '@tanstack/react-query';
 import { getCurrentUser } from '@/features/auth/api/auth';
@@ -24,6 +25,12 @@ export default function AppointmentsPage() {
   // Modal State
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null);
+
+  // Quick Add Patient State
+  const [isPatientDrawerOpen, setIsPatientDrawerOpen] = useState(false);
+  const [newPatientName, setNewPatientName] = useState('');
+  const [newPatientAdded, setNewPatientAdded] = useState<any>(null);
+  const [patientFormLoading, setPatientFormLoading] = useState(false);
 
   const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: getCurrentUser });
   const isDoctor = user?.role === 'DOCTOR';
@@ -75,7 +82,35 @@ export default function AppointmentsPage() {
       doctorId: app.doctorId?._id,
       patientId: app.patientId?._id
     });
+    setNewPatientAdded(null);
     setIsDrawerOpen(true);
+  };
+
+  const handleAddClick = () => {
+    setEditingAppointment(null);
+    setNewPatientAdded(null);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCreatePatientFromAppointment = (inputValue: string) => {
+    setNewPatientName(inputValue);
+    setIsPatientDrawerOpen(true);
+  };
+
+  const handlePatientSubmit = async (formData: any) => {
+    setPatientFormLoading(true);
+    try {
+      const { createPatient } = await import('@/features/patients/api/patients');
+      const res = await createPatient(formData);
+      toast.success('Patient created successfully');
+      setIsPatientDrawerOpen(false);
+      setNewPatientAdded(res.data);
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || 'Failed to create patient');
+    } finally {
+      setPatientFormLoading(false);
+    }
   };
 
   const handleCancelClick = (id: string) => {
@@ -125,7 +160,7 @@ export default function AppointmentsPage() {
           data={data}
           loading={loading}
           onSearch={setSearch}
-          onAddClick={isDoctor ? undefined : () => { setEditingAppointment(null); setIsDrawerOpen(true); }}
+          onAddClick={isDoctor ? undefined : handleAddClick}
           addButtonLabel={isDoctor ? undefined : "Book Appointment"}
           pagination={pagination}
           onPageChange={(page) => fetchAppointments(page, limit)}
@@ -176,8 +211,31 @@ export default function AppointmentsPage() {
         />
       </div>
 
-      <SlideOver isOpen={isDrawerOpen} onClose={() => { setIsDrawerOpen(false); setEditingAppointment(null); }} title={editingAppointment ? "Edit Appointment" : "Book Appointment"}>
-        <AppointmentForm onSubmit={handleCreateOrUpdate} loading={formLoading} defaultValues={editingAppointment} />
+      <SlideOver
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title={editingAppointment ? "Edit Appointment" : "Book Appointment"}
+      >
+        <AppointmentForm 
+           key={editingAppointment?._id || 'new'} 
+           defaultValues={editingAppointment} 
+           onSubmit={handleCreateOrUpdate} 
+           loading={formLoading} 
+           onCreateNewPatient={handleCreatePatientFromAppointment}
+           newPatientAdded={newPatientAdded}
+        />
+      </SlideOver>
+
+      <SlideOver
+        isOpen={isPatientDrawerOpen}
+        onClose={() => setIsPatientDrawerOpen(false)}
+        title="Quick Add Patient"
+      >
+        <PatientForm 
+           defaultValues={{ name: newPatientName }} 
+           onSubmit={handlePatientSubmit} 
+           loading={patientFormLoading} 
+        />
       </SlideOver>
 
       <ConfirmDialog 

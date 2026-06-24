@@ -1,12 +1,7 @@
-import axios from 'axios';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 // Setup axios instance with credentials (cookies) or auth header
-const adminApi = axios.create({
-  baseURL: `${API_URL}/admin`,
-  withCredentials: true,
-});
+import { adminApi } from '@/lib/axios';
 
 export const getDashboardMetrics = async () => {
   const response = await adminApi.get('/dashboard');

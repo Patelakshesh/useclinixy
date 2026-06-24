@@ -24,6 +24,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const handleLogout = async () => {
     try {
+      localStorage.removeItem('token');
       await logoutUser();
       queryClient.removeQueries({ queryKey: ['currentUser'] });
     } catch (error) {
@@ -57,7 +58,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="h-[100dvh] bg-slate-50 dark:bg-[#0A0A0A] flex overflow-hidden w-full relative">
+    <div className="fixed inset-0 bg-slate-50 dark:bg-[#0A0A0A] flex overflow-hidden w-full">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 

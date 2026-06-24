@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { loginSchema, LoginFormData } from '../schemas/auth.schema';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { loginUser, getCurrentUser } from '../api/auth';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
@@ -13,6 +13,7 @@ import Link from 'next/link';
 
 export const LoginForm = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -31,14 +32,19 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  if (!isUserLoading && user) {
-    if (user.role === 'SUPER_ADMIN') {
-      router.push('/admin/dashboard');
-    } else {
-      router.push('/dashboard');
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      if (user.role === 'SUPER_ADMIN') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     }
+  }, [isUserLoading, user, router]);
+
+  if (!isUserLoading && user) {
     return (
-      <div className="flex flex-col items-center justify-center space-y-4">
+      <div className="flex flex-col items-center justify-center space-y-4 pt-10 pb-4">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <p className="text-sm text-slate-500">Redirecting to your dashboard...</p>
       </div>
@@ -50,6 +56,13 @@ export const LoginForm = () => {
     setError(null);
     try {
       const res = await loginUser(data);
+      if (res.data?.token) {
+        localStorage.setItem('token', res.data.token);
+      }
+      
+      // CRITICAL: Clear the cached error so the next page starts with a clean loading state
+      queryClient.removeQueries({ queryKey: ['currentUser'] });
+      
       if (res.data?.user?.role === 'SUPER_ADMIN') {
         router.push('/admin/dashboard');
       } else {

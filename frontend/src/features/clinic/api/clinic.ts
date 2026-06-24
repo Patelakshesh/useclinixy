@@ -1,9 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
-  withCredentials: true,
-});
+import { api } from '@/lib/axios';
 
 export const getClinicProfile = async () => {
   const response = await api.get('/clinic/profile');
