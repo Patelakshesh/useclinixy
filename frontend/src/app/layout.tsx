@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://useclinixy.online'),
   title: 'Clinixy - The Modern Medical Clinic Management Platform',
   description: 'Clinixy is the ultimate SaaS platform for doctors and medical clinics. Automate appointment scheduling, patient management, staff coordination, and billing all in one place.',
   keywords: 'doctor appointment software, clinic management system, medical practice software, online booking for doctors, healthcare SaaS, Clinixy, patient scheduling, medical CRM',
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Clinixy - Advanced Medical Clinic Management',
     description: 'Automate your medical clinic with Clinixy. Effortless online patient booking, smart doctor scheduling, and complete practice management.',
-    url: 'https://useclinixy.vercel.app',
+    url: 'https://useclinixy.online',
     siteName: 'Clinixy',
     locale: 'en_US',
     type: 'website',

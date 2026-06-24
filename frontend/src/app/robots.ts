@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: ['/', '/booking/'],
       disallow: ['/dashboard/', '/admin/', '/api/'], // Protect private dashboards from Google
     },
-    sitemap: 'https://useclinixy.vercel.app/sitemap.xml',
+    sitemap: 'https://useclinixy.online/sitemap.xml',
   }
 }
