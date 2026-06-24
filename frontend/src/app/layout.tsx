@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     description: 'Transform your medical practice with smart patient scheduling and clinic management.',
   },
   verification: {
-    google: '7IUFSXsW-JniYCpIOg4zlNdtlMyafi7arRBJiw8G2-4',
+    google: 'iIpLhUNQ7yLht9bmYQ0iRpsmoRmzVARnJIzA9UDNM1I',
   },
   robots: {
     index: true,

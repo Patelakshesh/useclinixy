@@ -11,11 +11,22 @@ const app: Express = express();
 // Middlewares
 app.use(helmet());
 app.use(cors({ 
-  origin: [
-    'http://localhost:3000', 
-    'https://useclinixy.vercel.app',
-    process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, '') : ''
-  ].filter(Boolean), 
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Allow non-browser clients
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://useclinixy.vercel.app',
+      'https://useclinixy.online',
+      process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, '') : ''
+    ];
+
+    if (allowedOrigins.includes(origin) || origin.endsWith('.useclinixy.online')) {
+      return callback(null, true);
+    }
+    
+    return callback(new Error('Not allowed by CORS'));
+  }, 
   credentials: true 
 }));
 app.use(express.json());
