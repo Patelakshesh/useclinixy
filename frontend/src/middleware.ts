@@ -22,7 +22,8 @@ export function middleware(req: NextRequest) {
   const rootDomains = ['useclinixy.online', 'www.useclinixy.online', 'localhost:3000', 'useclinixy.vercel.app'];
 
   // 1. Detect if this is a subdomain request
-  const isSubdomain = !rootDomains.includes(hostname) && hostname.includes('.');
+  // We explicitly ignore .vercel.app preview URLs so they don't break Vercel deployments!
+  const isSubdomain = !rootDomains.includes(hostname) && !hostname.endsWith('.vercel.app') && hostname.includes('.');
 
   // Extract the specific subdomain (e.g., 'apollo' from 'apollo.useclinixy.online')
   const subdomain = isSubdomain ? hostname.split('.')[0] : null;
