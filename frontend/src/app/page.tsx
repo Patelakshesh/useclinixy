@@ -165,21 +165,23 @@ export default function Home() {
               </div>
               <div className="h-6 w-64 bg-slate-800 rounded-md ml-4"></div>
             </div>
-            {/* Fake UI Body */}
-            <div className="flex h-full">
-              <div className="w-64 border-r border-slate-800 p-6 space-y-4">
-                {[1,2,3,4,5].map(i => (
-                  <div key={i} className={`h-8 rounded-lg ${i === 1 ? 'bg-blue-600/20' : 'bg-slate-800/50'}`}></div>
-                ))}
-              </div>
-              <div className="flex-1 p-8 space-y-6">
-                <div className="flex gap-6">
-                  {[1,2,3].map(i => (
-                    <div key={i} className="flex-1 h-32 bg-slate-800/50 rounded-2xl border border-slate-700/50"></div>
-                  ))}
-                </div>
-                <div className="h-64 bg-slate-800/50 rounded-2xl border border-slate-700/50 w-full"></div>
-              </div>
+            {/* Real Dashboard Image Placeholder */}
+            <div className="relative w-full h-[500px] overflow-hidden bg-slate-900">
+              <img 
+                src="/dashboard-preview.png" 
+                alt="Clinixy Dashboard Preview" 
+                className="w-full h-full object-cover object-top opacity-90 transition-opacity hover:opacity-100"
+                onError={(e) => {
+                  // Fallback if they haven't uploaded the image yet
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-500">
+                      <p>Please take a screenshot of your dashboard</p>
+                      <p>and save it as <b>public/dashboard-preview.png</b></p>
+                    </div>
+                  `;
+                }}
+              />
             </div>
           </div>
         </motion.div>
@@ -269,13 +271,21 @@ export default function Home() {
                   <span className="text-white font-mono font-bold">apollo</span>
                   <span className="text-slate-500 font-mono">.useclinixy.online</span>
                 </div>
-                <div className="space-y-6">
-                  <div className="h-10 bg-slate-800 rounded-xl w-1/2"></div>
-                  <div className="h-40 bg-slate-800/50 rounded-2xl w-full border border-slate-700/30"></div>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="h-28 bg-indigo-500/10 rounded-2xl border border-indigo-500/20"></div>
-                    <div className="h-28 bg-slate-800/50 rounded-2xl border border-slate-700/30"></div>
-                  </div>
+                <div className="relative w-full h-[300px] rounded-xl overflow-hidden bg-slate-900 border border-slate-800">
+                  <img 
+                    src="/booking-preview.png" 
+                    alt="Patient Booking Preview" 
+                    className="w-full h-full object-cover object-top opacity-90 transition-opacity hover:opacity-100"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full text-slate-500 text-sm text-center px-4">
+                          <p>Take a screenshot of the patient booking page</p>
+                          <p>and save it as <b>public/booking-preview.png</b></p>
+                        </div>
+                      `;
+                    }}
+                  />
                 </div>
               </div>
             </motion.div>

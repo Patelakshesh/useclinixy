@@ -56,7 +56,7 @@ export const DoctorForm = ({ onSubmit, defaultValues, loading }: any) => {
           {errors.experience && <span className="text-xs text-red-500 mt-1">{errors.experience.message}</span>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Fees ($) <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Fees (₹) <span className="text-red-500">*</span></label>
           <input type="number" placeholder="100" {...register('consultationFees', { valueAsNumber: true })} className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-[#1A1A1A] dark:text-white outline-none focus:border-slate-400 dark:focus:border-neutral-600 transition-colors" />
           {errors.consultationFees && <span className="text-xs text-red-500 mt-1">{errors.consultationFees.message}</span>}
         </div>

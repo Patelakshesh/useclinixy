@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getDashboardMetrics } from '@/features/admin/api/admin';
-import { Building2, Activity, AlertTriangle, DollarSign } from 'lucide-react';
+import { Building2, Activity, AlertTriangle, IndianRupee } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function AdminDashboard() {
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
     { title: 'Total Clinics', value: kpis?.totalClinics || 0, icon: Building2, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
     { title: 'Active Subscriptions', value: kpis?.activeClinics || 0, icon: Activity, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' },
     { title: 'Suspended Clinics', value: kpis?.suspendedClinics || 0, icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30' },
-    { title: 'Monthly Revenue', value: `$${(kpis?.mrr || 0).toLocaleString()}`, icon: DollarSign, color: 'text-indigo-500', bg: 'bg-indigo-100 dark:bg-indigo-900/30' },
+    { title: 'Monthly Revenue', value: `₹${(kpis?.mrr || 0).toLocaleString()}`, icon: IndianRupee, color: 'text-indigo-500', bg: 'bg-indigo-100 dark:bg-indigo-900/30' },
   ];
 
   return (

@@ -147,7 +147,7 @@ export default function DoctorsPage() {
                   <span className="text-slate-400">{doc.mobileNumber}</span>
                 </div>
               </td>
-              <td className="px-6 py-4 font-medium">${doc.consultationFees}</td>
+              <td className="px-6 py-4 font-medium">₹{doc.consultationFees}</td>
               <td className="px-6 py-4">
                  <span className={`px-2 py-1 text-xs rounded-full font-medium ${doc.status === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-500' : 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300'}`}>
                     {doc.status}

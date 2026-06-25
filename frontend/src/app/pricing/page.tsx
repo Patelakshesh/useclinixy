@@ -10,7 +10,7 @@ export default function PricingPage() {
   const plans = [
     {
       name: "Starter Clinic",
-      price: "$49",
+      price: "₹3,999",
       description: "Perfect for solo practitioners starting their digital journey.",
       features: [
         "1 Doctor Account",
@@ -29,7 +29,7 @@ export default function PricingPage() {
     },
     {
       name: "Professional",
-      price: "$99",
+      price: "₹7,999",
       description: "The complete operating system for growing medical practices.",
       features: [
         "Up to 5 Doctor Accounts",
