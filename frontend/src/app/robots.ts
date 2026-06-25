@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: ['/', '/booking/'],
-      disallow: ['/dashboard/', '/admin/', '/api/'], // Protect private dashboards from Google
+      disallow: ['/dashboard/', '/admin/', '/api/', '/auth-sync/'], // Protect private dashboards from Google
     },
     sitemap: 'https://useclinixy.online/sitemap.xml',
   }
