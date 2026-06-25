@@ -23,13 +23,7 @@ export const loginUser = async (email: string, password: string) => {
     throw new Error('Your account is deactivated');
   }
 
-  // Check if clinic is suspended
-  if (user.clinicId) {
-    const clinic = await Clinic.findById(user.clinicId);
-    if (clinic && clinic.status === 'SUSPENDED') {
-      throw new Error('Your clinic account has been suspended by the administrator.');
-    }
-  }
+  // Removed clinic suspension check here so they can login and pay. The middleware will block all non-billing routes.
 
   const token = signToken({
     userId: user._id.toString(),

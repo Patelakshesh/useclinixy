@@ -227,6 +227,8 @@ export default function SettingsPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Mobile Number</label>
                     <input
+                      maxLength={10}
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '').slice(0, 10); }}
                       {...profileForm.register('mobileNumber')}
                       className="w-full px-4 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
                     />

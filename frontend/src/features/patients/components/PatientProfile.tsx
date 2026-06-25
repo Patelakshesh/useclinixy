@@ -123,8 +123,14 @@ export const PatientProfile = ({ patient }: { patient: any }) => {
               <div className="text-sm font-medium text-slate-900 dark:text-white">{patient.bloodGroup || 'Not Specified'}</div>
             </div>
             <div>
+              <div className="text-xs font-semibold text-slate-500 dark:text-neutral-500 uppercase tracking-wider mb-1">Height & Weight</div>
+              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                {patient.height ? `${patient.height} cm` : 'N/A'} • {patient.weight ? `${patient.weight} kg` : 'N/A'}
+              </div>
+            </div>
+            <div>
               <div className="text-xs font-semibold text-slate-500 dark:text-neutral-500 uppercase tracking-wider mb-1">Address</div>
-              <div className="text-sm font-medium text-slate-900 dark:text-white">{patient.address || 'Not Specified'}</div>
+              <div className="text-sm font-medium text-slate-900 dark:text-white truncate" title={patient.address || 'Not Specified'}>{patient.address || 'Not Specified'}</div>
             </div>
           </div>
         </div>
@@ -158,7 +164,17 @@ export const PatientProfile = ({ patient }: { patient: any }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-xs font-medium text-slate-700 dark:text-neutral-300 mb-1">Condition/Diagnosis <span className="text-red-500">*</span></label>
-                  <input required placeholder="e.g. Hypertension" value={newHistory.condition} onChange={e => setNewHistory({...newHistory, condition: e.target.value})} className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-black dark:text-white outline-none focus:border-slate-400 dark:focus:border-neutral-600" />
+                  <input required list="common-conditions" placeholder="e.g. Hypertension" value={newHistory.condition} onChange={e => setNewHistory({...newHistory, condition: e.target.value})} className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-black dark:text-white outline-none focus:border-slate-400 dark:focus:border-neutral-600" />
+                  <datalist id="common-conditions">
+                    <option value="Hypertension" />
+                    <option value="Diabetes Mellitus Type 2" />
+                    <option value="Asthma" />
+                    <option value="Hypothyroidism" />
+                    <option value="Migraine" />
+                    <option value="Anemia" />
+                    <option value="Fever (Pyrexia)" />
+                    <option value="Cough & Cold" />
+                  </datalist>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-700 dark:text-neutral-300 mb-1">Date <span className="text-red-500">*</span></label>

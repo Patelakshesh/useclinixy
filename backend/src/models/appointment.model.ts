@@ -7,8 +7,11 @@ export interface IAppointment extends Document {
   appointmentDate: string; // YYYY-MM-DD
   appointmentTime: string; // HH:mm
   status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
-  type: 'CONSULTATION' | 'FOLLOW_UP' | 'PROCEDURE';
+  type: 'CONSULTATION' | 'FOLLOW_UP' | 'PROCEDURE' | 'EMERGENCY';
   duration: number; // in minutes
+  paymentMode: 'CASH' | 'ONLINE' | 'PENDING';
+  feesApplied: number;
+  isEmergency: boolean;
   notes?: string;
 }
 
@@ -26,10 +29,17 @@ const appointmentSchema: Schema = new Schema(
     },
     type: {
       type: String,
-      enum: ['CONSULTATION', 'FOLLOW_UP', 'PROCEDURE'],
+      enum: ['CONSULTATION', 'FOLLOW_UP', 'PROCEDURE', 'EMERGENCY'],
       default: 'CONSULTATION',
     },
-    duration: { type: Number, default: 30 },
+    duration: { type: Number, default: 15 },
+    paymentMode: {
+      type: String,
+      enum: ['CASH', 'ONLINE', 'PENDING'],
+      default: 'PENDING',
+    },
+    feesApplied: { type: Number, default: 0 },
+    isEmergency: { type: Boolean, default: false },
     notes: { type: String },
   },
   { timestamps: true }

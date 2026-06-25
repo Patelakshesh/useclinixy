@@ -38,10 +38,24 @@ export const getCurrentSubscription = async (req: Request, res: Response, next: 
       return;
     }
 
+    const clinic = await Clinic.findById(clinicId);
+
+    // Check for expiration
+    const now = new Date();
+    if (subscription && subscription.status === 'ACTIVE' && subscription.currentPeriodEnd < now) {
+      subscription.status = 'EXPIRED' as any;
+      await subscription.save();
+      if (clinic) {
+        clinic.status = 'SUSPENDED';
+        await clinic.save();
+      }
+    }
+
     // Map planId to plan for consistency with frontend expectations
     const responseData = {
       ...subscription.toObject(),
-      plan: subscription.planId
+      plan: subscription.planId,
+      clinicStatus: clinic?.status
     };
 
     res.status(200).json({ success: true, data: responseData });

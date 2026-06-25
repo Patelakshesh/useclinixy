@@ -8,7 +8,9 @@ export interface IDoctor extends Document {
   specialization: string;
   qualification: string;
   experience: number;
-  consultationFees: number;
+  newPatientFee: number;
+  oldPatientFee: number;
+  emergencyFee: number;
   schedule: {
     day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
     isWorkingDay: boolean;
@@ -26,7 +28,9 @@ const doctorSchema: Schema = new Schema(
     specialization: { type: String, required: true },
     qualification: { type: String, required: true },
     experience: { type: Number, required: true },
-    consultationFees: { type: Number, required: true },
+    newPatientFee: { type: Number, required: true, default: 0 },
+    oldPatientFee: { type: Number, required: true, default: 0 },
+    emergencyFee: { type: Number, required: true, default: 0 },
     schedule: {
       type: [{
         day: { type: String, required: true },

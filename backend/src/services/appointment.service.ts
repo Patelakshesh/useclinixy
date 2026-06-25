@@ -7,48 +7,70 @@ export const createAppointment = async (clinicId: string, data: Partial<IAppoint
   const doctor = await Doctor.findOne({ _id: data.doctorId, clinicId });
   if (!doctor) throw new Error('Doctor not found');
 
-  // Check Leaves
-  const isLeave = await DoctorLeave.findOne({
-    doctorId: data.doctorId,
-    clinicId,
-    status: 'APPROVED',
-    startDate: { $lte: data.appointmentDate },
-    endDate: { $gte: data.appointmentDate },
-  });
-  if (isLeave) throw new Error('Doctor is on leave on this date');
+  if (!data.isEmergency) {
+    // Check Leaves
+    const isLeave = await DoctorLeave.findOne({
+      doctorId: data.doctorId,
+      clinicId,
+      status: 'APPROVED',
+      startDate: { $lte: data.appointmentDate },
+      endDate: { $gte: data.appointmentDate },
+    });
+    if (isLeave) throw new Error('Doctor is on leave on this date');
 
-  // Check Schedule (Day of week)
-  if (data.appointmentDate && data.appointmentTime) {
-    const dateObj = new Date(data.appointmentDate);
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayName = days[dateObj.getUTCDay()];
+    // Check Schedule (Day of week)
+    if (data.appointmentDate && data.appointmentTime) {
+      const dateObj = new Date(data.appointmentDate);
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const dayName = days[dateObj.getUTCDay()];
 
-    const daySchedule = doctor.schedule?.find((s: any) => s.day === dayName);
-    if (!daySchedule || !daySchedule.isWorkingDay) {
-      throw new Error(`Doctor does not work on ${dayName}s`);
+      const daySchedule = doctor.schedule?.find((s: any) => s.day === dayName);
+      if (!daySchedule || !daySchedule.isWorkingDay) {
+        throw new Error(`Doctor does not work on ${dayName}s`);
+      }
+
+      // Check if time falls within a shift
+      const appointmentTimeStr = data.appointmentTime; // e.g., "14:30"
+      const isValidTime = daySchedule.shifts.some((shift: any) => {
+        return appointmentTimeStr >= shift.startTime && appointmentTimeStr <= shift.endTime;
+      });
+
+      if (!isValidTime) {
+        throw new Error('Appointment time is outside doctor working hours or during a break');
+      }
     }
 
-    // Check if time falls within a shift
-    const appointmentTimeStr = data.appointmentTime; // e.g., "14:30"
-    const isValidTime = daySchedule.shifts.some((shift: any) => {
-      return appointmentTimeStr >= shift.startTime && appointmentTimeStr <= shift.endTime;
+    // 2. Check double booking manually for friendly error message
+    const existing = await Appointment.findOne({
+      doctorId: data.doctorId,
+      appointmentDate: data.appointmentDate,
+      appointmentTime: data.appointmentTime,
+      status: { $ne: 'CANCELLED' }
     });
 
-    if (!isValidTime) {
-      throw new Error('Appointment time is outside doctor working hours or during a break');
+    if (existing) {
+      throw new Error('Doctor is already booked for this time slot');
     }
   }
 
-  // 2. Check double booking manually for friendly error message
-  const existing = await Appointment.findOne({
-    doctorId: data.doctorId,
-    appointmentDate: data.appointmentDate,
-    appointmentTime: data.appointmentTime,
-    status: { $ne: 'CANCELLED' }
-  });
-
-  if (existing) {
-    throw new Error('Doctor is already booked for this time slot');
+  // 3. Dynamic Fee Calculation
+  if (data.feesApplied === undefined) {
+    let fees = doctor.newPatientFee;
+    
+    if (data.isEmergency) {
+      fees = doctor.emergencyFee;
+    } else {
+      // Check if old patient
+      const pastVisits = await Appointment.countDocuments({ 
+        patientId: data.patientId, 
+        clinicId, 
+        status: { $in: ['COMPLETED', 'CONFIRMED'] } 
+      });
+      if (pastVisits > 0) {
+        fees = doctor.oldPatientFee;
+      }
+    }
+    data.feesApplied = fees;
   }
 
   const appointment = new Appointment({ ...data, clinicId });

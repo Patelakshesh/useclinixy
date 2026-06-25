@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
-import { Building2, Mail, Lock, User, Phone, MapPin, Globe, ArrowRight } from 'lucide-react';
+import { Building2, Mail, Lock, User, Phone, MapPin, Globe, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -15,7 +15,7 @@ const registerSchema = z.object({
   clinicName: z.string().min(3, 'Clinic name is required'),
   subdomain: z.string().min(3, 'Subdomain must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed'),
   address: z.string().min(5, 'Address is required'),
-  phone: z.string().min(10, 'Valid phone number is required'),
+  phone: z.string().regex(/^\d{10}$/, 'Must be exactly 10 digits'),
   adminName: z.string().min(2, 'Name is required'),
   adminEmail: z.string().email('Valid email is required'),
   adminPassword: z.string().min(8, 'Password must be at least 8 characters'),
@@ -27,13 +27,44 @@ export default function RegisterClinic() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormValues>({
+  const { register, handleSubmit, formState: { errors }, watch, setError, clearErrors } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema)
   });
 
   const subdomain = watch('subdomain');
+  const [checkingSubdomain, setCheckingSubdomain] = useState(false);
+  const [subdomainAvailable, setSubdomainAvailable] = useState<boolean | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (!subdomain || subdomain.length < 3) {
+      setSubdomainAvailable(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setCheckingSubdomain(true);
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/clinic/check-subdomain/${subdomain}`);
+        if (res.data.available) {
+          setSubdomainAvailable(true);
+          clearErrors('subdomain');
+        } else {
+          setSubdomainAvailable(false);
+          setError('subdomain', { type: 'manual', message: 'This subdomain is already taken. Please try another one.' });
+        }
+      } catch (err) {
+        console.error('Failed to check subdomain', err);
+      } finally {
+        setCheckingSubdomain(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [subdomain, setError, clearErrors]);
 
   const onSubmit = async (data: RegisterFormValues) => {
+    if (subdomainAvailable === false) return;
     setLoading(true);
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/clinic/register`, data);
@@ -49,7 +80,13 @@ export default function RegisterClinic() {
         }
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to register clinic');
+      if (error.response?.data?.message === 'Subdomain already in use') {
+        setError('subdomain', { type: 'manual', message: 'This subdomain is already taken. Please try another one.' });
+      } else if (error.response?.data?.message === 'Email already registered') {
+        setError('adminEmail', { type: 'manual', message: 'This email is already registered. Try logging in.' });
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to register clinic');
+      }
     } finally {
       setLoading(false);
     }
@@ -121,9 +158,14 @@ export default function RegisterClinic() {
                     className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow dark:text-white"
                     placeholder="cityhospital"
                   />
+                  {checkingSubdomain && (
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
                 </div>
-                {subdomain && !errors.subdomain && (
-                  <p className="text-[10px] text-green-600 dark:text-green-400 mt-1">Your portal: https://{subdomain}.useclinixy.online/</p>
+                {subdomain && !errors.subdomain && subdomainAvailable && !checkingSubdomain && (
+                  <p className="text-[10px] text-green-600 dark:text-green-400 mt-1">✓ Available! Your portal: https://{subdomain}.useclinixy.online/</p>
                 )}
                 {errors.subdomain && <p className="text-xs text-red-500 mt-1">{errors.subdomain.message}</p>}
               </div>
@@ -167,9 +209,11 @@ export default function RegisterClinic() {
                     <Phone className="h-4 w-4 text-slate-400" />
                   </div>
                   <input
+                    maxLength={10}
+                    onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '').slice(0, 10); }}
                     {...register('phone')}
                     className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow dark:text-white"
-                    placeholder="+1 234 567 8900"
+                    placeholder="9876543210"
                   />
                 </div>
                 {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>}
@@ -200,10 +244,17 @@ export default function RegisterClinic() {
                 </div>
                 <input
                   {...register('adminPassword')}
-                  type="password"
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow dark:text-white"
+                  type={showPassword ? "text" : "password"}
+                  className="w-full pl-10 pr-10 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow dark:text-white"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
               {errors.adminPassword && <p className="text-xs text-red-500 mt-1">{errors.adminPassword.message}</p>}
             </div>

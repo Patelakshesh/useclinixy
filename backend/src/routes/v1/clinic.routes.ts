@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { getClinicProfile, updateClinicProfile, registerClinic } from '../../controllers/clinic.controller';
+import { getClinicProfile, updateClinicProfile, registerClinic, checkSubdomain } from '../../controllers/clinic.controller';
 import { requireAuth, requireClinicAdmin } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
+router.get('/check-subdomain/:subdomain', checkSubdomain);
 router.post('/register', registerClinic);
 
 router.use(requireAuth);

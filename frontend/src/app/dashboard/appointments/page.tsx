@@ -156,7 +156,7 @@ export default function AppointmentsPage() {
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
         <DataTable 
           title="Appointments"
-          columns={isDoctor ? ['Date & Time', 'Patient', 'Status'] : ['Date & Time', 'Patient', 'Doctor', 'Status', 'Actions']}
+          columns={isDoctor ? ['Date & Time', 'Patient', 'Fees', 'Status'] : ['Date & Time', 'Patient', 'Doctor', 'Fees', 'Status', 'Actions']}
           data={data}
           loading={loading}
           onSearch={setSearch}
@@ -183,6 +183,12 @@ export default function AppointmentsPage() {
                    <div className="text-xs text-slate-500">{app.doctorId?.specialization}</div>
                 </td>
               )}
+              <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
+                 ₹{app.feesApplied ?? 0}
+                 {app.isEmergency && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded uppercase font-bold">EMG</span>}
+                 {app.paymentMode === 'CASH' && <span className="ml-2 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase font-bold">CASH</span>}
+                 {app.paymentMode === 'ONLINE' && <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded uppercase font-bold">ONLINE</span>}
+              </td>
               <td className="px-6 py-4">
                  <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(app.status)}`}>
                     {app.status}

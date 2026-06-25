@@ -72,7 +72,7 @@ export const getClinicDoctors = async (req: Request, res: Response, next: NextFu
       return;
     }
 
-    const doctors = await Doctor.find({ clinicId: clinic._id, status: 'ACTIVE' }).select('name specialization consultationFees schedule');
+    const doctors = await Doctor.find({ clinicId: clinic._id, status: 'ACTIVE' }).select('name specialization newPatientFee schedule');
     res.status(200).json({ success: true, data: doctors });
   } catch (error) {
     next(error);

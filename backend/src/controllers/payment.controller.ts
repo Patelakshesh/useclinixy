@@ -33,6 +33,13 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 
+    const clinic = await Clinic.findById(clinicId);
+    const subscription = await Subscription.findOne({ clinicId });
+    if (clinic && clinic.status === 'SUSPENDED' && subscription && subscription.status === 'ACTIVE') {
+      res.status(403).json({ success: false, message: 'Your clinic has been suspended by the administrator. Please contact support.' });
+      return;
+    }
+
     // Razorpay expects amount in paise (multiply by 100)
     const amountInPaise = plan.price * 100;
 
@@ -78,10 +85,27 @@ export const verifyPayment = async (req: Request, res: Response, next: NextFunct
       return;
     }
 
+    const plan = await SubscriptionPlan.findById(planId);
+    if (!plan) {
+      res.status(404).json({ success: false, message: 'Plan not found' });
+      return;
+    }
+
     // Payment is valid! Upgrade the clinic subscription.
-    // Calculate new period ends 30 days from now
     const now = new Date();
-    const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    let periodEnd = new Date();
+    if (plan.interval === 'DAYS' || plan.interval === 'DAILY') {
+      periodEnd.setDate(now.getDate() + plan.intervalCount);
+    } else if (plan.interval === 'MONTHLY') {
+      periodEnd.setMonth(now.getMonth() + plan.intervalCount);
+    } else if (plan.interval === 'YEARLY') {
+      periodEnd.setFullYear(now.getFullYear() + plan.intervalCount);
+    } else if (plan.interval === 'MINUTES') {
+      periodEnd.setMinutes(now.getMinutes() + plan.intervalCount);
+    } else {
+      // Default fallback
+      periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    }
 
     let subscription = await Subscription.findOne({ clinicId });
 

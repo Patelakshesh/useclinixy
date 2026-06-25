@@ -7,6 +7,9 @@ export const createPatientSchema = z.object({
     age: z.number().min(0, 'Age must be positive'),
     gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
     address: z.string().optional(),
+    height: z.number().optional(),
+    weight: z.number().optional(),
+    bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
     notes: z.string().optional(),
   }),
 });

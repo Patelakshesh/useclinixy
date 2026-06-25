@@ -37,6 +37,8 @@ export default function BillingPage() {
   }
 
   const isTrial = currentSub?.status === 'TRIAL';
+  const isExpired = currentSub?.status === 'EXPIRED';
+  const isManuallySuspended = currentSub?.clinicStatus === 'SUSPENDED' && !isExpired;
   const planName = currentSub?.plan?.name || 'Starter';
   const expiresAt = currentSub?.currentPeriodEnd ? new Date(currentSub.currentPeriodEnd) : null;
 
@@ -104,6 +106,23 @@ export default function BillingPage() {
     }
   };
 
+  if (isManuallySuspended) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Billing & Subscription</h2>
+        </div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-2xl p-8 text-center">
+          <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-red-700 dark:text-red-400 mb-2">Account Suspended</h3>
+          <p className="text-red-600 dark:text-red-300 max-w-md mx-auto">
+            Your clinic account has been suspended by the administrator. You cannot modify your subscription or access the dashboard at this time. Please contact support for assistance.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div>
@@ -112,7 +131,7 @@ export default function BillingPage() {
       </div>
 
       {/* Current Plan Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className={`rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden ${isExpired ? 'bg-gradient-to-r from-red-600 to-rose-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'}`}>
         <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-12 -translate-y-12">
           <Zap className="w-64 h-64" />
         </div>
@@ -126,11 +145,18 @@ export default function BillingPage() {
                   Free Trial
                 </span>
               )}
+              {isExpired && (
+                <span className="px-2.5 py-1 text-xs font-semibold bg-white text-red-600 rounded-full uppercase tracking-wide">
+                  EXPIRED
+                </span>
+              )}
             </div>
-            <p className="text-blue-100">
-              {isTrial 
-                ? `Your trial expires on ${expiresAt ? format(expiresAt, 'MMMM d, yyyy') : 'soon'}. Upgrade to continue.`
-                : `Your subscription renews on ${expiresAt ? format(expiresAt, 'MMMM d, yyyy') : 'N/A'}.`}
+            <p className={isExpired ? 'text-red-100' : 'text-blue-100'}>
+              {isExpired 
+                ? `Your subscription expired on ${expiresAt ? format(expiresAt, 'MMMM d, yyyy h:mm a') : 'recently'}. Please renew to restore access.`
+                : isTrial 
+                ? `Your trial expires on ${expiresAt ? format(expiresAt, 'MMMM d, yyyy h:mm a') : 'soon'}. Upgrade to continue.`
+                : `Your subscription renews on ${expiresAt ? format(expiresAt, 'MMMM d, yyyy h:mm a') : 'N/A'}.`}
             </p>
           </div>
         </div>
@@ -163,18 +189,18 @@ export default function BillingPage() {
                     <span className="text-3xl font-extrabold text-slate-900 dark:text-white">
                       {plan.price === 0 ? 'Free' : `₹${plan.price.toLocaleString()}`}
                     </span>
-                    {plan.price > 0 && <span className="text-slate-500 dark:text-neutral-400 font-medium">/mo</span>}
+                    {plan.price > 0 && <span className="text-slate-500 dark:text-neutral-400 font-medium">/{plan.interval === 'LIFETIME' ? 'lifetime' : `${plan.intervalCount > 1 ? plan.intervalCount + ' ' : ''}${plan.interval.replace('_', ' ').toLowerCase()}`}</span>}
                   </div>
                 </div>
 
                 <ul className="flex-1 space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
-                    <span className="text-sm text-slate-600 dark:text-neutral-300">Up to <strong className="text-slate-900 dark:text-white">{plan.features.maxDoctors === 999 ? 'Unlimited' : plan.features.maxDoctors}</strong> Doctors</span>
+                    <span className="text-sm text-slate-600 dark:text-neutral-300">Up to <strong className="text-slate-900 dark:text-white">{plan.features.maxDoctors === 999 ? 'Unlimited' : (plan.features.maxDoctors || 0)}</strong> Doctors</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
-                    <span className="text-sm text-slate-600 dark:text-neutral-300">Up to <strong className="text-slate-900 dark:text-white">{plan.features.maxPatients === 999999 ? 'Unlimited' : plan.features.maxPatients.toLocaleString()}</strong> Patients</span>
+                    <span className="text-sm text-slate-600 dark:text-neutral-300">Up to <strong className="text-slate-900 dark:text-white">{plan.features.maxPatients >= 999999 ? 'Unlimited' : (plan.features.maxPatients || 0).toLocaleString()}</strong> Patients</span>
                   </li>
                   <li className="flex items-start gap-3">
                     {plan.features.hasWhatsApp ? (
@@ -199,16 +225,18 @@ export default function BillingPage() {
                 </ul>
 
                 <button 
-                  disabled={isCurrent || (plan.price === 0 && !isTrial) || processingId !== null}
+                  disabled={(isCurrent && !isExpired) || (plan.price === 0 && !isTrial && !isExpired) || processingId !== null}
                   onClick={() => handleUpgrade(plan)}
                   className={`w-full py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
-                    isCurrent 
+                    isCurrent && !isExpired
                       ? 'bg-slate-100 text-slate-400 dark:bg-neutral-800 dark:text-neutral-500 cursor-not-allowed'
+                      : isCurrent && isExpired
+                      ? 'bg-red-600 text-white hover:bg-red-700'
                       : 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200'
                   }`}
                 >
                   {processingId === plan._id && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isCurrent ? 'Current Plan' : (plan.price < (currentSub?.plan?.price || 0) ? 'Downgrade to ' + plan.name : 'Upgrade to ' + plan.name)}
+                  {isCurrent && !isExpired ? 'Current Plan' : isCurrent && isExpired ? 'Renew Plan' : (plan.price < (currentSub?.plan?.price || 0) ? 'Downgrade to ' + plan.name : 'Upgrade to ' + plan.name)}
                 </button>
               </div>
             );

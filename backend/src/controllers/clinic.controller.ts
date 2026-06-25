@@ -1,8 +1,30 @@
 import { Request, Response, NextFunction } from 'express';
 import Clinic from '../models/clinic.model';
 import User from '../models/user.model';
+import SubscriptionPlan from '../models/subscriptionPlan.model';
+import Subscription from '../models/subscription.model';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+
+export const checkSubdomain = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { subdomain } = req.params;
+    if (!subdomain) {
+      res.status(400).json({ success: false, message: 'Subdomain is required' });
+      return;
+    }
+    const normalizedSubdomain = subdomain.toLowerCase().trim();
+    const existingClinic = await Clinic.findOne({ subdomain: normalizedSubdomain });
+    
+    if (existingClinic) {
+      res.status(200).json({ success: true, available: false, message: 'Subdomain already taken' });
+    } else {
+      res.status(200).json({ success: true, available: true, message: 'Subdomain available' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getClinicProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -56,8 +78,10 @@ export const registerClinic = async (req: Request, res: Response, next: NextFunc
   try {
     const { clinicName, subdomain, address, phone, adminName, adminEmail, adminPassword } = req.body;
 
+    const normalizedSubdomain = subdomain.toLowerCase().trim();
+
     // Check if subdomain is available
-    const existingClinic = await Clinic.findOne({ subdomain }).session(session);
+    const existingClinic = await Clinic.findOne({ subdomain: normalizedSubdomain }).session(session);
     if (existingClinic) {
       res.status(400).json({ success: false, message: 'Subdomain already in use' });
       await session.abortTransaction();
@@ -90,7 +114,7 @@ export const registerClinic = async (req: Request, res: Response, next: NextFunc
     // Create Clinic
     const clinic = new Clinic({
       name: clinicName,
-      subdomain,
+      subdomain: normalizedSubdomain,
       address,
       phone,
       email: adminEmail,
@@ -110,12 +134,46 @@ export const registerClinic = async (req: Request, res: Response, next: NextFunc
     await clinic.save({ session });
     await adminUser.save({ session });
 
+    // Check for default registration plan
+    const defaultPlan = await SubscriptionPlan.findOne({ isDefault: true }).session(session);
+    let successMessage = 'Clinic registered successfully. Welcome to your trial!';
+
+    if (defaultPlan) {
+      const now = new Date();
+      let endDate = new Date();
+
+      if (defaultPlan.interval === 'DAYS' || defaultPlan.interval === 'DAILY') {
+        endDate.setDate(now.getDate() + defaultPlan.intervalCount);
+      } else if (defaultPlan.interval === 'MONTHLY') {
+        endDate.setMonth(now.getMonth() + defaultPlan.intervalCount);
+      } else if (defaultPlan.interval === 'YEARLY') {
+        endDate.setFullYear(now.getFullYear() + defaultPlan.intervalCount);
+      } else if (defaultPlan.interval === 'MINUTES') {
+        endDate.setMinutes(now.getMinutes() + defaultPlan.intervalCount);
+      }
+
+      const subscription = new Subscription({
+        clinicId: clinic._id,
+        planId: defaultPlan._id,
+        status: 'ACTIVE',
+        currentPeriodStart: now,
+        currentPeriodEnd: endDate,
+        razorpaySubscriptionId: 'manual_default_plan',
+      });
+      await subscription.save({ session });
+      successMessage = `Clinic registered successfully. You have been assigned the ${defaultPlan.name} plan!`;
+      
+      // Update clinic status to ACTIVE since they have a subscription
+      clinic.status = 'ACTIVE';
+      await clinic.save({ session });
+    }
+
     await session.commitTransaction();
     session.endSession();
 
     res.status(201).json({ 
       success: true, 
-      message: 'Clinic registered successfully. Welcome to your 14-day trial!',
+      message: successMessage,
       data: {
         clinicId: clinic._id,
         subdomain: clinic.subdomain

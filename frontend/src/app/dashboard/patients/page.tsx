@@ -106,7 +106,7 @@ export default function PatientsPage() {
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
         <DataTable 
           title="Patients"
-          columns={isDoctor ? ['Name', 'Age & Gender', 'Contact', 'Address', 'Profile'] : ['Name', 'Age & Gender', 'Contact', 'Address', 'Actions']}
+          columns={isDoctor ? ['Name', 'Unique ID', 'Age & Gender', 'Contact', 'Address', 'Profile'] : ['Name', 'Unique ID', 'Age & Gender', 'Contact', 'Address', 'Actions']}
           data={data}
           loading={loading}
           onSearch={setSearch}
@@ -122,8 +122,19 @@ export default function PatientsPage() {
                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600 dark:bg-neutral-800 dark:text-neutral-300">
                       {patient.name.charAt(0)}
                    </div>
-                   {patient.name}
+                   <div className="flex flex-col">
+                     <span className="text-slate-900 dark:text-white">{patient.name}</span>
+                   </div>
                 </div>
+              </td>
+              <td className="px-6 py-4">
+                 {patient.uhid ? (
+                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                     {patient.uhid}
+                   </span>
+                 ) : (
+                   <span className="text-slate-400 dark:text-neutral-500 text-xs">N/A</span>
+                 )}
               </td>
               <td className="px-6 py-4">
                  {patient.age} Yrs • <span className="capitalize">{patient.gender.toLowerCase()}</span>

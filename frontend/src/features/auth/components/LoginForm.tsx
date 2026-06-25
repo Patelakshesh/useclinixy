@@ -33,6 +33,13 @@ export const LoginForm = () => {
   });
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('expired') === 'true') {
+        setError('Your subscription has expired. Please log in as Clinic Admin to renew.');
+      }
+    }
+    
     if (!isUserLoading && user) {
       if (user.role === 'SUPER_ADMIN') {
         router.push('/admin/dashboard');

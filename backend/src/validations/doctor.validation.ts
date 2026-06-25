@@ -8,7 +8,9 @@ export const createDoctorSchema = z.object({
     specialization: z.string().min(1, 'Specialization is required'),
     qualification: z.string().min(1, 'Qualification is required'),
     experience: z.number().min(0, 'Experience must be a positive number'),
-    consultationFees: z.number().min(0, 'Fees cannot be negative'),
+    newPatientFee: z.number().min(0, 'Fees cannot be negative'),
+    oldPatientFee: z.number().min(0, 'Fees cannot be negative'),
+    emergencyFee: z.number().min(0, 'Fees cannot be negative'),
     schedule: z.array(z.object({
       day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
       isWorkingDay: z.boolean(),

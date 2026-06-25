@@ -7,8 +7,11 @@ export const createAppointmentSchema = z.object({
     appointmentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
     appointmentTime: z.string().regex(/^\d{2}:\d{2}$/, 'Time must be HH:mm'),
     notes: z.string().optional(),
-    type: z.enum(['CONSULTATION', 'FOLLOW_UP', 'PROCEDURE']).optional(),
+    type: z.enum(['CONSULTATION', 'FOLLOW_UP', 'PROCEDURE', 'EMERGENCY']).optional(),
     duration: z.number().min(5).max(480).optional(),
+    paymentMode: z.enum(['CASH', 'ONLINE', 'PENDING']).optional(),
+    feesApplied: z.number().min(0).optional(),
+    isEmergency: z.boolean().optional(),
   }),
 });
 

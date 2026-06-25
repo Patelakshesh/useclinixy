@@ -5,7 +5,9 @@ export interface ISubscriptionPlan extends Document {
   priceId: string; // Razorpay Plan ID or Stripe Price ID
   price: number;
   currency: string;
-  interval: 'MONTHLY' | 'YEARLY';
+  interval: 'MINUTES' | 'HOURLY' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | '3_YEARS' | 'LIFETIME';
+  intervalCount: number; // e.g., 14 for 14 Days
+  discountPrice?: number;
   features: {
     maxDoctors: number;
     maxPatients: number;
@@ -13,6 +15,7 @@ export interface ISubscriptionPlan extends Document {
     hasOnlineBooking: boolean;
   };
   isActive: boolean;
+  isDefault: boolean;
 }
 
 const subscriptionPlanSchema = new Schema<ISubscriptionPlan>(
@@ -20,8 +23,14 @@ const subscriptionPlanSchema = new Schema<ISubscriptionPlan>(
     name: { type: String, required: true },
     priceId: { type: String, required: true },
     price: { type: Number, required: true },
+    discountPrice: { type: Number, default: 0 },
     currency: { type: String, default: 'INR' },
-    interval: { type: String, enum: ['MONTHLY', 'YEARLY'], default: 'MONTHLY' },
+    interval: { 
+      type: String, 
+      enum: ['MINUTES', 'HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', '3_YEARS', 'LIFETIME'], 
+      default: 'MONTHLY' 
+    },
+    intervalCount: { type: Number, default: 1 },
     features: {
       maxDoctors: { type: Number, default: 1 },
       maxPatients: { type: Number, default: 100 },
@@ -29,6 +38,7 @@ const subscriptionPlanSchema = new Schema<ISubscriptionPlan>(
       hasOnlineBooking: { type: Boolean, default: false },
     },
     isActive: { type: Boolean, default: true },
+    isDefault: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

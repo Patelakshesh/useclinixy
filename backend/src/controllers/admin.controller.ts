@@ -3,6 +3,8 @@ import Clinic from '../models/clinic.model';
 import User from '../models/user.model';
 import Subscription from '../models/subscription.model';
 import SubscriptionPlan from '../models/subscriptionPlan.model';
+import Doctor from '../models/doctor.model';
+import Patient from '../models/patient.model';
 import AuditLog from '../models/auditLog.model';
 import { logAudit } from '../utils/auditLog.util';
 
@@ -31,10 +33,10 @@ export const getAdminDashboardMetrics = async (req: Request, res: Response, next
 export const getAllClinics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { status, search } = req.query;
-    let filter: any = {};
+    let filter: any = { status: { $ne: 'DELETED' } };
     if (status) filter.status = status;
     if (search) { filter.$or = [{ name: { $regex: search, $options: 'i' } }, { subdomain: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }]; }
-    const clinics = await Clinic.find(filter).populate('ownerId', 'name email').sort({ createdAt: -1 });
+    const clinics = await Clinic.find(filter).populate('ownerId', 'name email').populate({ path: 'subscriptionId', select: 'planId' }).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: clinics });
   } catch (error) { next(error); }
 };
@@ -54,6 +56,16 @@ export const updateClinicStatus = async (req: Request, res: Response, next: Next
   } catch (error) { next(error); }
 };
 
+export const deleteClinic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const clinic = await Clinic.findByIdAndUpdate(id, { status: 'DELETED' }, { new: true });
+    if (!clinic) { res.status(404).json({ success: false, message: 'Clinic not found' }); return; }
+    logAudit((req as any).user.userId, 'CLINIC_DELETED', { clinicId: id }, null, req.ip);
+    res.status(200).json({ success: true, message: 'Clinic soft deleted successfully' });
+  } catch (error) { next(error); }
+};
+
 export const getAllSubscriptions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const subscriptions = await Subscription.find()
@@ -62,6 +74,104 @@ export const getAllSubscriptions = async (req: Request, res: Response, next: Nex
       .sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: subscriptions });
   } catch (error) { next(error); }
+};
+
+export const assignManualSubscription = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id } = req.params; // clinicId
+    const { planId, paymentMethod } = req.body;
+
+    const clinic = await Clinic.findById(id);
+    if (!clinic) {
+      res.status(404).json({ success: false, message: 'Clinic not found' });
+      return;
+    }
+
+    const plan = await SubscriptionPlan.findById(planId);
+    if (!plan) {
+      res.status(404).json({ success: false, message: 'Subscription Plan not found' });
+      return;
+    }
+
+    // Check downgrade limits
+    const currentDoctors = await Doctor.countDocuments({ clinicId: id });
+    const currentPatients = await Patient.countDocuments({ clinicId: id });
+
+    if (currentDoctors > plan.features.maxDoctors) {
+      res.status(400).json({ 
+        success: false, 
+        message: `Cannot assign plan. Clinic has ${currentDoctors} doctors, but this plan only allows ${plan.features.maxDoctors}. They must delete ${currentDoctors - plan.features.maxDoctors} doctor(s) first.` 
+      });
+      return;
+    }
+
+    if (currentPatients > plan.features.maxPatients) {
+      res.status(400).json({ 
+        success: false, 
+        message: `Cannot assign plan. Clinic has ${currentPatients} patients, but this plan only allows ${plan.features.maxPatients}. They must delete ${currentPatients - plan.features.maxPatients} patient(s) first.` 
+      });
+      return;
+    }
+
+    // Cancel existing active subscription
+    await Subscription.updateMany({ clinicId: id, status: 'ACTIVE' }, { $set: { status: 'CANCELLED' } });
+
+    // Create new manual subscription
+    const currentPeriodStart = new Date();
+    const currentPeriodEnd = new Date();
+    const count = plan.intervalCount || 1;
+
+    switch (plan.interval) {
+      case 'MINUTES':
+        currentPeriodEnd.setMinutes(currentPeriodEnd.getMinutes() + count);
+        break;
+      case 'HOURLY':
+        currentPeriodEnd.setHours(currentPeriodEnd.getHours() + count);
+        break;
+      case 'DAILY':
+        currentPeriodEnd.setDate(currentPeriodEnd.getDate() + count);
+        break;
+      case 'WEEKLY':
+        currentPeriodEnd.setDate(currentPeriodEnd.getDate() + (7 * count));
+        break;
+      case 'MONTHLY':
+        currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + count);
+        break;
+      case 'YEARLY':
+        currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + count);
+        break;
+      case '3_YEARS':
+        currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 3);
+        break;
+      case 'LIFETIME':
+        currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 100);
+        break;
+      default:
+        currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + 1);
+    }
+
+    const subscription = new Subscription({
+      clinicId: id,
+      planId,
+      status: 'ACTIVE',
+      currentPeriodStart,
+      currentPeriodEnd,
+      cancelAtPeriodEnd: false
+    });
+    
+    await subscription.save();
+
+    // Update clinic status
+    clinic.status = 'ACTIVE';
+    clinic.subscriptionId = (subscription as any)._id;
+    await clinic.save();
+
+    logAudit((req as any).user.userId, 'MANUAL_SUBSCRIPTION_ASSIGNED', { clinicId: id, planId, paymentMethod }, null, req.ip);
+
+    res.status(200).json({ success: true, message: 'Manual subscription assigned successfully', data: subscription });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getAuditLogs = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -85,6 +195,9 @@ export const getPlansAdmin = async (req: Request, res: Response, next: NextFunct
 
 export const createPlan = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    if (req.body.isDefault) {
+      await SubscriptionPlan.updateMany({}, { $set: { isDefault: false } });
+    }
     const plan = new SubscriptionPlan(req.body);
     await plan.save();
     logAudit((req as any).user.userId, 'PLAN_CREATED', { planId: (plan as any)._id, name: plan.name }, null, req.ip);
@@ -94,6 +207,9 @@ export const createPlan = async (req: Request, res: Response, next: NextFunction
 
 export const updatePlan = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    if (req.body.isDefault) {
+      await SubscriptionPlan.updateMany({ _id: { $ne: req.params.id } }, { $set: { isDefault: false } });
+    }
     const plan = await SubscriptionPlan.findByIdAndUpdate((req.params.id as string), { $set: req.body }, { new: true, runValidators: true });
     if (!plan) { res.status(404).json({ success: false, message: 'Plan not found' }); return; }
     logAudit((req as any).user.userId, 'PLAN_UPDATED', { planId: (req.params.id as string), name: plan.name }, null, req.ip);

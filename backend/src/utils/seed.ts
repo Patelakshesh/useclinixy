@@ -89,7 +89,9 @@ const seedDatabase = async () => {
         specialization: doc.spec,
         qualification: 'MBBS, MD',
         experience: doc.exp,
-        consultationFees: doc.fees,
+        newPatientFee: doc.fees,
+        oldPatientFee: doc.fees - 100,
+        emergencyFee: doc.fees + 200,
         status: 'ACTIVE',
       }))
     );

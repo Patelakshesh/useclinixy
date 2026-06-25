@@ -13,23 +13,44 @@ const schema = z.object({
   patientId: z.string().min(1, 'Patient is required'),
   appointmentDate: z.string().min(1, 'Date is required'),
   appointmentTime: z.string().min(1, 'Time is required'),
+  paymentMode: z.enum(['CASH', 'ONLINE', 'PENDING']).default('PENDING'),
+  isEmergency: z.boolean().default(false),
+  feesApplied: z.number().min(0, 'Required'),
   notes: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
 
 export const AppointmentForm = ({ onSubmit, defaultValues, loading, onCreateNewPatient, newPatientAdded }: any) => {
-  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues });
+  const now = new Date();
+  const currentDate = now.toISOString().split('T')[0];
+  const coeff = 1000 * 60 * 15;
+  const rounded = new Date(Math.round(now.getTime() / coeff) * coeff);
+  const currentTime = rounded.toTimeString().split(' ')[0].substring(0, 5); // HH:mm
+
+  const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<FormData>({ 
+    resolver: zodResolver(schema), 
+    defaultValues: {
+      appointmentDate: currentDate,
+      appointmentTime: currentTime,
+      paymentMode: 'PENDING',
+      isEmergency: false,
+      feesApplied: 0,
+      ...defaultValues 
+    } 
+  });
   
   const [doctors, setDoctors] = useState([]);
   const [patients, setPatients] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
 
   useEffect(() => {
     getDoctors('', 1, 1000).then(res => setDoctors(res.data));
-  }, []);
-
-  useEffect(() => {
     getPatients('', 1, 1000).then(res => setPatients(res.data));
+    // Import getAppointments locally to fetch patient history
+    import('@/features/appointments/api/appointments').then(m => {
+       m.getAppointments('', 1, 1000).then(res => setAppointments(res.data));
+    });
   }, []);
 
   useEffect(() => {
@@ -43,7 +64,7 @@ export const AppointmentForm = ({ onSubmit, defaultValues, loading, onCreateNewP
 
   const patientOptions = patients.map((p: any) => ({
     value: p._id,
-    label: `${p.name} (${p.mobileNumber})`
+    label: p.uhid ? `[${p.uhid}] ${p.name}` : p.name
   }));
 
   return (
@@ -56,6 +77,58 @@ export const AppointmentForm = ({ onSubmit, defaultValues, loading, onCreateNewP
         </select>
         {errors.doctorId && <span className="text-xs text-red-500 mt-1">{errors.doctorId.message}</span>}
       </div>
+
+      {watch('doctorId') && (() => {
+         const d: any = doctors.find((doc: any) => doc._id === watch('doctorId'));
+         if (!d) return null;
+         
+         // Auto-calculate fee based on patient history and emergency status
+         let calculatedFee = d.newPatientFee || 0;
+         let statusText = "New Patient";
+         
+         const pId = watch('patientId');
+         const isEmg = watch('isEmergency');
+         
+         if (pId) {
+            const hasCompletedVisit = appointments.some(app => app.patientId?._id === pId && (app.status === 'COMPLETED' || app.status === 'CONFIRMED'));
+            if (hasCompletedVisit) {
+               calculatedFee = d.oldPatientFee || 0;
+               statusText = "Old Patient";
+            }
+         }
+         if (isEmg) {
+            calculatedFee = d.emergencyFee || 0;
+            statusText = "Emergency Case";
+         }
+
+         // Update form value seamlessly without triggering infinite loop
+         setTimeout(() => {
+            if (watch('feesApplied') !== calculatedFee) {
+               setValue('feesApplied', calculatedFee);
+            }
+         }, 0);
+
+         return (
+           <div className="bg-blue-50 dark:bg-[#151c2f] border border-blue-100 dark:border-blue-900/50 rounded-lg p-3 flex flex-col gap-3">
+              <span className="text-blue-800 dark:text-blue-400 font-medium whitespace-nowrap">Fee Structure Overview:</span>
+              <div className="grid grid-cols-3 gap-2">
+                 <div className="flex flex-col items-center justify-center bg-white dark:bg-[#1A1A1A] py-1.5 rounded shadow-sm border border-slate-100 dark:border-neutral-800">
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold leading-tight">New</span>
+                    <span className="text-slate-900 dark:text-white font-medium leading-tight">₹{d.newPatientFee || 0}</span>
+                 </div>
+                 <div className="flex flex-col items-center justify-center bg-white dark:bg-[#1A1A1A] py-1.5 rounded shadow-sm border border-slate-100 dark:border-neutral-800">
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold leading-tight">Old</span>
+                    <span className="text-slate-900 dark:text-white font-medium leading-tight">₹{d.oldPatientFee || 0}</span>
+                 </div>
+                 <div className="flex flex-col items-center justify-center bg-red-50 dark:bg-red-900/20 py-1.5 rounded shadow-sm border border-red-100 dark:border-red-900/30">
+                    <span className="text-[10px] text-red-600 dark:text-red-400 uppercase font-semibold leading-tight">Emg</span>
+                    <span className="text-red-700 dark:text-red-300 font-bold leading-tight">₹{d.emergencyFee || 0}</span>
+                 </div>
+              </div>
+           </div>
+         );
+      })()}
+
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Patient <span className="text-red-500">*</span></label>
         <Controller
@@ -102,9 +175,38 @@ export const AppointmentForm = ({ onSubmit, defaultValues, loading, onCreateNewP
          </div>
          <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Time <span className="text-red-500">*</span></label>
-            <input type="time" {...register('appointmentTime')} className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-[#1A1A1A] dark:text-white outline-none dark:[color-scheme:dark]" />
+            <input type="time" step="900" {...register('appointmentTime')} className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-[#1A1A1A] dark:text-white outline-none dark:[color-scheme:dark]" />
             {errors.appointmentTime && <span className="text-xs text-red-500 mt-1">{errors.appointmentTime.message}</span>}
          </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col">
+          <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Payment Mode</label>
+          <select {...register('paymentMode')} className="w-full mt-auto rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-[#1A1A1A] dark:text-white outline-none focus:border-slate-400 dark:focus:border-neutral-600">
+            <option value="PENDING">Pending (Pay Later)</option>
+            <option value="CASH">Cash</option>
+            <option value="ONLINE">Online (UPI/Card)</option>
+          </select>
+        </div>
+        <div className="flex flex-col">
+           <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1 whitespace-nowrap overflow-hidden text-ellipsis">Final Amount</label>
+           <div className="relative mt-auto">
+              <span className="absolute left-3 top-2 text-sm text-slate-500">₹</span>
+              <input type="number" {...register('feesApplied', { valueAsNumber: true })} readOnly className="w-full rounded-md border border-slate-200 bg-slate-100 dark:bg-neutral-900 pl-6 pr-3 py-2 text-sm font-bold text-slate-900 dark:text-white dark:border-neutral-800 outline-none cursor-not-allowed" />
+           </div>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <input type="checkbox" id="isEmergency" {...register('isEmergency')} className="hidden peer" />
+        <label htmlFor="isEmergency" className="w-5 h-5 border-2 border-slate-300 dark:border-neutral-600 rounded flex items-center justify-center peer-checked:bg-red-500 peer-checked:border-red-500 cursor-pointer transition-colors">
+          <svg className="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </label>
+        <label htmlFor="isEmergency" className="text-sm font-bold text-red-600 dark:text-red-400 cursor-pointer">
+          Emergency Case (High Priority)
+        </label>
       </div>
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Notes</label>

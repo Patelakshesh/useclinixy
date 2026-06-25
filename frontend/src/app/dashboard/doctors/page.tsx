@@ -147,7 +147,13 @@ export default function DoctorsPage() {
                   <span className="text-slate-400">{doc.mobileNumber}</span>
                 </div>
               </td>
-              <td className="px-6 py-4 font-medium">₹{doc.consultationFees}</td>
+              <td className="px-6 py-4">
+                <div className="flex flex-col gap-0.5 text-xs">
+                  <span className="text-slate-700 dark:text-slate-300">New: <span className="font-medium">₹{doc.newPatientFee || 0}</span></span>
+                  <span className="text-slate-700 dark:text-slate-300">Old: <span className="font-medium">₹{doc.oldPatientFee || 0}</span></span>
+                  <span className="text-red-600 dark:text-red-400">Emg: <span className="font-medium">₹{doc.emergencyFee || 0}</span></span>
+                </div>
+              </td>
               <td className="px-6 py-4">
                  <span className={`px-2 py-1 text-xs rounded-full font-medium ${doc.status === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-500' : 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300'}`}>
                     {doc.status}

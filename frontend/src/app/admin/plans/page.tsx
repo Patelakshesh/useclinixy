@@ -7,8 +7,9 @@ import { Plus, Pencil, Trash2, Check, X, Loader2, Users, UserCheck, MessageSquar
 import toast from 'react-hot-toast';
 
 const defaultForm = {
-  name: '', price: 0, currency: 'INR', interval: 'MONTHLY', priceId: 'plan_manual',
+  name: '', price: 0, discountPrice: 0, currency: 'INR', interval: 'MONTHLY', intervalCount: 1, priceId: 'plan_manual',
   isActive: true,
+  isDefault: false,
   features: { maxDoctors: 1, maxPatients: 100, hasWhatsApp: false, hasOnlineBooking: false },
 };
 
@@ -43,7 +44,7 @@ export default function AdminPlansPage() {
 
   const handleEdit = (plan: any) => {
     setEditingPlan(plan);
-    setForm({ name: plan.name, price: plan.price, currency: plan.currency, interval: plan.interval, priceId: plan.priceId, isActive: plan.isActive, features: { ...plan.features } });
+    setForm({ name: plan.name, price: plan.price, discountPrice: plan.discountPrice || 0, currency: plan.currency, interval: plan.interval, intervalCount: plan.intervalCount || 1, priceId: plan.priceId, isActive: plan.isActive, isDefault: plan.isDefault || false, features: { ...plan.features } });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -87,26 +88,57 @@ export default function AdminPlansPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Price (₹) *</label>
-                <input required type="number" min={0} value={form.price} onChange={e => setForm({ ...form, price: parseInt(e.target.value) || 0 })}
+                <input required type="number" min={0} value={form.price} onChange={e => setForm({ ...form, price: e.target.value === '' ? '' as any : parseInt(e.target.value) })}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Billing Interval</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Discount Offer Price (₹)</label>
+                <input type="number" min={0} value={form.discountPrice} onChange={e => setForm({ ...form, discountPrice: e.target.value === '' ? '' as any : parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" 
+                  placeholder="Leave 0 if no discount" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Duration Value (e.g. 14, 1, 3)</label>
+                <input type="number" min={1} value={form.intervalCount} onChange={e => setForm({ ...form, intervalCount: e.target.value === '' ? '' as any : parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Duration Type</label>
                 <select value={form.interval} onChange={e => setForm({ ...form, interval: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                  <option value="MONTHLY">Monthly</option>
-                  <option value="YEARLY">Yearly</option>
+                  <option value="MINUTES">Minutes</option>
+                  <option value="HOURLY">Hours</option>
+                  <option value="DAILY">Days</option>
+                  <option value="WEEKLY">Weeks</option>
+                  <option value="MONTHLY">Months</option>
+                  <option value="YEARLY">Years</option>
+                  <option value="3_YEARS">Fixed 3 Years</option>
+                  <option value="LIFETIME">Lifetime</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Max Doctors</label>
-                <input type="number" min={1} value={form.features.maxDoctors} onChange={e => setForm({ ...form, features: { ...form.features, maxDoctors: parseInt(e.target.value) || 1 } })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                <label className="flex justify-between items-center text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">
+                  Max Doctors
+                  <label className="flex items-center gap-1.5 cursor-pointer text-xs font-normal text-blue-600 dark:text-blue-400">
+                    <input type="checkbox" checked={form.features.maxDoctors === 999} onChange={(e) => setForm({ ...form, features: { ...form.features, maxDoctors: e.target.checked ? 999 : 1 } })} className="w-3 h-3 rounded accent-blue-600" />
+                    Unlimited
+                  </label>
+                </label>
+                <input type="number" min={1} disabled={form.features.maxDoctors === 999} value={form.features.maxDoctors === 999 ? '' : (form.features.maxDoctors ?? '')} onChange={e => setForm({ ...form, features: { ...form.features, maxDoctors: e.target.value === '' ? '' as any : parseInt(e.target.value) } })}
+                  placeholder={form.features.maxDoctors === 999 ? 'Unlimited' : ''}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:opacity-50" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Max Patients</label>
-                <input type="number" min={1} value={form.features.maxPatients} onChange={e => setForm({ ...form, features: { ...form.features, maxPatients: parseInt(e.target.value) || 100 } })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                <label className="flex justify-between items-center text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">
+                  Max Patients
+                  <label className="flex items-center gap-1.5 cursor-pointer text-xs font-normal text-blue-600 dark:text-blue-400">
+                    <input type="checkbox" checked={form.features.maxPatients >= 999999} onChange={(e) => setForm({ ...form, features: { ...form.features, maxPatients: e.target.checked ? 999999 : 100 } })} className="w-3 h-3 rounded accent-blue-600" />
+                    Unlimited
+                  </label>
+                </label>
+                <input type="number" min={1} disabled={form.features.maxPatients >= 999999} value={form.features.maxPatients >= 999999 ? '' : (form.features.maxPatients ?? '')} onChange={e => setForm({ ...form, features: { ...form.features, maxPatients: e.target.value === '' ? '' as any : parseInt(e.target.value) } })}
+                  placeholder={form.features.maxPatients >= 999999 ? 'Unlimited' : ''}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:opacity-50" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Razorpay Price ID</label>
@@ -130,7 +162,12 @@ export default function AdminPlansPage() {
               <label className="flex items-center gap-2.5 cursor-pointer">
                 <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })}
                   className="w-4 h-4 rounded accent-blue-600" />
-                <span className="text-sm text-slate-700 dark:text-neutral-300 font-medium">Plan is Active (visible to clinics)</span>
+                <span className="text-sm text-slate-700 dark:text-neutral-300 font-medium">Plan is Active</span>
+              </label>
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input type="checkbox" checked={form.isDefault} onChange={e => setForm({ ...form, isDefault: e.target.checked })}
+                  className="w-4 h-4 rounded accent-purple-600" />
+                <span className="text-sm text-slate-700 dark:text-neutral-300 font-medium text-purple-600 dark:text-purple-400">Default Registration Plan</span>
               </label>
             </div>
 
@@ -156,20 +193,30 @@ export default function AdminPlansPage() {
       ) : plans.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {plans.map((plan: any) => (
-            <div key={plan._id} className={`relative bg-white dark:bg-[#111] rounded-2xl border-2 shadow-sm p-6 flex flex-col ${plan.isActive ? 'border-slate-100 dark:border-neutral-800' : 'border-dashed border-slate-200 dark:border-neutral-700 opacity-60'}`}>
+            <div key={plan._id} className={`relative bg-white dark:bg-[#111] rounded-2xl border-2 shadow-sm p-6 flex flex-col ${plan.isDefault ? 'border-purple-500 shadow-purple-500/10' : plan.isActive ? 'border-slate-100 dark:border-neutral-800' : 'border-dashed border-slate-200 dark:border-neutral-700 opacity-60'}`}>
               {!plan.isActive && <span className="absolute top-3 right-3 text-xs bg-slate-100 dark:bg-neutral-800 text-slate-500 px-2 py-0.5 rounded-full">Inactive</span>}
+              {plan.isDefault && <span className="absolute top-3 right-3 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full font-semibold border border-purple-200 dark:border-purple-800/50">Default Plan</span>}
               
-              <div className="mb-4">
+              <div className="mb-4 mt-2">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">{plan.name}</h3>
-                <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-2xl font-extrabold text-slate-900 dark:text-white">₹{plan.price.toLocaleString()}</span>
-                  <span className="text-slate-500 text-sm">/ {plan.interval === 'MONTHLY' ? 'mo' : 'yr'}</span>
+                <div className="flex flex-col mt-1">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                      ₹{(plan.discountPrice && plan.discountPrice > 0 ? plan.discountPrice : plan.price).toLocaleString()}
+                    </span>
+                    {plan.discountPrice > 0 && (
+                      <span className="text-sm text-slate-400 line-through">₹{plan.price.toLocaleString()}</span>
+                    )}
+                  </div>
+                  <span className="text-slate-500 text-sm">
+                    {plan.interval === 'LIFETIME' ? 'Lifetime' : `per ${plan.intervalCount > 1 ? plan.intervalCount + ' ' : ''}${plan.interval.replace('_', ' ').toLowerCase()}`}
+                  </span>
                 </div>
               </div>
 
               <ul className="flex-1 space-y-2 text-sm text-slate-600 dark:text-neutral-400 mb-6">
-                <li className="flex items-center gap-2"><Users className="w-4 h-4 text-blue-500 shrink-0" /> {plan.features.maxDoctors === 999 ? 'Unlimited' : plan.features.maxDoctors} Doctors</li>
-                <li className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-purple-500 shrink-0" /> {plan.features.maxPatients >= 999999 ? 'Unlimited' : plan.features.maxPatients.toLocaleString()} Patients</li>
+                <li className="flex items-center gap-2"><Users className="w-4 h-4 text-blue-500 shrink-0" /> {plan.features.maxDoctors === 999 ? 'Unlimited' : (plan.features.maxDoctors || 0)} Doctors</li>
+                <li className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-purple-500 shrink-0" /> {plan.features.maxPatients >= 999999 ? 'Unlimited' : (plan.features.maxPatients || 0).toLocaleString()} Patients</li>
                 <li className={`flex items-center gap-2 ${plan.features.hasWhatsApp ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-neutral-600 line-through'}`}>
                   <MessageSquare className="w-4 h-4 shrink-0" /> WhatsApp Notifications
                 </li>

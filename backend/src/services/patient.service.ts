@@ -5,7 +5,9 @@ import Appointment from '../models/appointment.model';
 import Prescription from '../models/prescription.model';
 
 export const createPatient = async (clinicId: string, patientData: Partial<IPatient>) => {
-  const patient = new Patient({ ...patientData, clinicId });
+  // Generate a Unique Health ID (UHID) for the patient
+  const uhid = `CLX-${Math.floor(100000 + Math.random() * 900000)}`;
+  const patient = new Patient({ ...patientData, clinicId, uhid });
   return await patient.save();
 };
 

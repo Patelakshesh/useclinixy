@@ -18,6 +18,16 @@ export const updateClinicStatus = async (id: string, status: string) => {
   return response.data;
 };
 
+export const deleteClinic = async (id: string) => {
+  const response = await adminApi.delete(`/admin/clinics/${id}`);
+  return response.data;
+};
+
+export const assignManualSubscription = async (id: string, data: { planId: string; paymentMethod: string }) => {
+  const response = await adminApi.post(`/admin/clinics/${id}/subscription`, data);
+  return response.data;
+};
+
 export const getAllSubscriptions = async () => {
   const response = await adminApi.get('/admin/subscriptions');
   return response.data.data;

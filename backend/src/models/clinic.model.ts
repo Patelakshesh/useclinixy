@@ -12,7 +12,7 @@ export interface IClinic extends Document {
     end: string;
     days: string[];
   };
-  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'TRIAL';
+  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'TRIAL' | 'DELETED';
   subscriptionId?: mongoose.Types.ObjectId;
   ownerId?: mongoose.Types.ObjectId;
 }
@@ -30,7 +30,7 @@ const clinicSchema: Schema = new Schema(
       end: { type: String, required: true },
       days: [{ type: String }],
     },
-    status: { type: String, enum: ['ACTIVE', 'INACTIVE', 'SUSPENDED', 'TRIAL'], default: 'TRIAL' },
+    status: { type: String, enum: ['ACTIVE', 'INACTIVE', 'SUSPENDED', 'TRIAL', 'DELETED'], default: 'TRIAL' },
     subscriptionId: { type: Schema.Types.ObjectId, ref: 'Subscription' },
     ownerId: { type: Schema.Types.ObjectId, ref: 'User' },
   },

@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
 
 const createTransporter = () => {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return null;
+  }
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
@@ -17,6 +20,7 @@ export const sendPasswordResetEmail = async (to: string, name: string, resetToke
   const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
   const transporter = createTransporter();
+  if (!transporter) return;
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
@@ -52,6 +56,7 @@ export const sendPasswordResetEmail = async (to: string, name: string, resetToke
 
 export const sendWelcomeEmail = async (to: string, name: string, clinicName: string): Promise<void> => {
   const transporter = createTransporter();
+  if (!transporter) return;
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
@@ -62,7 +67,7 @@ export const sendWelcomeEmail = async (to: string, name: string, clinicName: str
         <h2 style="color: #1e293b; font-size: 20px; font-weight: 600; margin: 0 0 12px;">Welcome to Clinixy! 🎉</h2>
         <p style="color: #64748b; font-size: 15px; line-height: 1.6; margin: 0 0 16px;">
           Hi ${name}, your clinic <strong>${clinicName}</strong> has been successfully registered.
-          Your 14-day free trial has started — no credit card required.
+          Your trial has started — no credit card required.
         </p>
         <p style="color: #64748b; font-size: 15px; line-height: 1.6; margin: 0 0 28px;">
           Log in to your dashboard to add doctors, manage patients, and start accepting appointments.

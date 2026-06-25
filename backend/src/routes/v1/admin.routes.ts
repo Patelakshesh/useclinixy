@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAdminDashboardMetrics, getAllClinics, updateClinicStatus, getAllSubscriptions, getAuditLogs, getPlansAdmin, createPlan, updatePlan, deletePlan } from '../../controllers/admin.controller';
+import { getAdminDashboardMetrics, getAllClinics, updateClinicStatus, deleteClinic, getAllSubscriptions, getAuditLogs, getPlansAdmin, createPlan, updatePlan, deletePlan, assignManualSubscription } from '../../controllers/admin.controller';
 import { requireAuth, requireSuperAdmin } from '../../middlewares/auth.middleware';
 
 const router = Router();
@@ -12,6 +12,8 @@ router.get('/dashboard', getAdminDashboardMetrics);
 // Clinics Management
 router.get('/clinics', getAllClinics);
 router.patch('/clinics/:id/status', updateClinicStatus);
+router.delete('/clinics/:id', deleteClinic);
+router.post('/clinics/:id/subscription', assignManualSubscription);
 
 // Subscriptions (billing records)
 router.get('/subscriptions', getAllSubscriptions);

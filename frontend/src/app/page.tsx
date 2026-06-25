@@ -118,7 +118,7 @@ export default function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
             </span>
-            Clinixy v1.0 is Live
+            Clinixy is Live
           </motion.div>
           
           <motion.h1 variants={fadeIn} className="text-6xl sm:text-7xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-8 transition-colors">

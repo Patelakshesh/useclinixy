@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const clinicProfileSchema = z.object({
   name: z.string().min(2, 'Clinic name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  mobileNumber: z.string().min(10, 'Mobile number must be at least 10 digits'),
+  mobileNumber: z.string().regex(/^\d{10}$/, 'Mobile number must be exactly 10 digits'),
   address: z.string().min(5, 'Address must be at least 5 characters'),
   workingHours: z.object({
     start: z.string().min(1, 'Start time is required'),

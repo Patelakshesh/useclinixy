@@ -1,167 +1,131 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { CheckCircle2, ArrowRight, X } from 'lucide-react';
+import { Metadata } from 'next';
 import Link from 'next/link';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { Activity } from 'lucide-react';
+import { ArrowRight, Check, Zap } from 'lucide-react';
+import { Navbar } from '@/components/layout/Navbar';
+
+export const metadata: Metadata = {
+  title: 'Pricing - Clinixy | Affordable Clinic Management Software',
+  description: 'Simple, transparent pricing for clinics of all sizes. Start your 14-day free trial today. Manage appointments, patients, and billing with Clinixy.',
+  alternates: {
+    canonical: 'https://useclinixy.online/pricing',
+  }
+};
 
 export default function PricingPage() {
-  const plans = [
-    {
-      name: "Starter Clinic",
-      price: "₹3,999",
-      description: "Perfect for solo practitioners starting their digital journey.",
-      features: [
-        "1 Doctor Account",
-        "Unlimited Patient Records",
-        "Online Booking Link",
-        "Basic Calendar Management",
-        "Email Reminders"
-      ],
-      missing: [
-        "Custom Subdomain",
-        "SMS Reminders",
-        "Multi-Staff Management",
-        "Advanced Analytics"
-      ],
-      recommended: false
-    },
-    {
-      name: "Professional",
-      price: "₹7,999",
-      description: "The complete operating system for growing medical practices.",
-      features: [
-        "Up to 5 Doctor Accounts",
-        "Custom Branded Subdomain",
-        "SMS & Email Reminders",
-        "Multi-Staff Management",
-        "Advanced Analytics & Reports",
-        "Prescription Builder",
-        "Priority 24/7 Support"
-      ],
-      missing: [],
-      recommended: true
-    },
-    {
-      name: "Hospital Network",
-      price: "Custom",
-      description: "Enterprise-grade infrastructure for large scale networks.",
-      features: [
-        "Unlimited Doctor Accounts",
-        "Multiple Clinic Locations",
-        "Custom API Access",
-        "Dedicated Account Manager",
-        "White-glove Onboarding",
-        "Custom Integration",
-        "SLA Guarantee"
-      ],
-      missing: [],
-      recommended: false
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans transition-colors duration-300">
-      {/* Navigation */}
-      <nav className="sticky top-0 w-full z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 cursor-pointer group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-              <Activity className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-white dark:bg-black font-sans text-slate-900 dark:text-neutral-100 selection:bg-blue-500/30">
+      <Navbar />
+      
+      <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+            Simple, transparent <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">pricing</span>
+          </h1>
+          <p className="text-xl text-slate-500 dark:text-slate-400 font-medium">
+            Start with a 14-day free trial. No credit card required. Upgrade when you're ready to scale your practice.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Starter Plan */}
+          <div className="relative flex flex-col bg-slate-50 dark:bg-neutral-900/50 rounded-3xl p-8 border border-slate-200 dark:border-neutral-800">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2">Starter</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Perfect for solo practitioners</p>
             </div>
-            <span className="text-xl font-black text-slate-900 dark:text-white">Clinixy</span>
-          </Link>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <ThemeToggle />
-            <Link href="/login" className="hidden sm:block text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-semibold transition-colors">
-              Log In
+            <div className="mb-6">
+              <span className="text-4xl font-black">₹999</span>
+              <span className="text-slate-500 dark:text-slate-400">/month</span>
+            </div>
+            <ul className="space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Up to 2 Doctors</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Up to 2,000 Patients</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Public Booking Portal</span>
+              </li>
+            </ul>
+            <Link href="/register-clinic" className="w-full py-3 px-4 bg-slate-900 dark:bg-white text-white dark:text-black font-bold text-center rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
+              Start Free Trial
             </Link>
-            <Link href="/register-clinic" className="px-5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold transition-all hover:-translate-y-0.5">
+          </div>
+
+          {/* Pro Plan */}
+          <div className="relative flex flex-col bg-white dark:bg-black rounded-3xl p-8 border-2 border-blue-600 shadow-2xl shadow-blue-900/20 transform md:-translate-y-4">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1 text-sm font-bold uppercase tracking-widest rounded-full flex items-center gap-1">
+              <Zap className="w-4 h-4" /> Most Popular
+            </div>
+            <div className="mb-6 mt-2">
+              <h3 className="text-2xl font-bold mb-2">Pro</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">For growing polyclinics</p>
+            </div>
+            <div className="mb-6">
+              <span className="text-4xl font-black">₹1,999</span>
+              <span className="text-slate-500 dark:text-slate-400">/month</span>
+            </div>
+            <ul className="space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Up to 5 Doctors</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Unlimited Patients</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Public Booking Portal</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Priority Support</span>
+              </li>
+            </ul>
+            <Link href="/register-clinic" className="w-full py-3 px-4 bg-blue-600 text-white font-bold text-center rounded-xl hover:bg-blue-700 transition-colors">
+              Start Free Trial
+            </Link>
+          </div>
+
+          {/* Premium Plan */}
+          <div className="relative flex flex-col bg-slate-50 dark:bg-neutral-900/50 rounded-3xl p-8 border border-slate-200 dark:border-neutral-800">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2">Premium</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">For large hospitals & chains</p>
+            </div>
+            <div className="mb-6">
+              <span className="text-4xl font-black">₹4,999</span>
+              <span className="text-slate-500 dark:text-slate-400">/month</span>
+            </div>
+            <ul className="space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Unlimited Doctors</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Unlimited Patients</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Public Booking Portal</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>Dedicated Account Manager</span>
+              </li>
+            </ul>
+            <Link href="/register-clinic" className="w-full py-3 px-4 bg-slate-900 dark:bg-white text-white dark:text-black font-bold text-center rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
               Start Free Trial
             </Link>
           </div>
         </div>
-      </nav>
-
-      {/* Header */}
-      <div className="pt-24 pb-16 text-center max-w-3xl mx-auto px-4">
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight"
-        >
-          Simple, transparent pricing
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-xl text-slate-500 dark:text-slate-400 font-medium"
-        >
-          Start with a 14-day free trial. No credit card required. Cancel anytime.
-        </motion.p>
-      </div>
-
-      {/* Pricing Cards */}
-      <div className="max-w-7xl mx-auto px-4 pb-32">
-        <div className="grid md:grid-cols-3 gap-8 items-start">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.15 }}
-              className={`relative bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border ${
-                plan.recommended 
-                  ? 'border-blue-500 shadow-2xl shadow-blue-500/20 scale-100 md:scale-105 z-10' 
-                  : 'border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none'
-              }`}
-            >
-              {plan.recommended && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-                  Most Popular
-                </div>
-              )}
-              
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{plan.name}</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 h-10">{plan.description}</p>
-              
-              <div className="mb-8">
-                <span className="text-5xl font-black text-slate-900 dark:text-white">{plan.price}</span>
-                {plan.price !== 'Custom' && <span className="text-slate-500 dark:text-slate-400 font-medium">/month</span>}
-              </div>
-              
-              <Link
-                href="/register-clinic"
-                className={`w-full py-4 rounded-full font-bold text-lg transition-all flex items-center justify-center gap-2 mb-8 ${
-                  plan.recommended
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-600/30 hover:-translate-y-0.5'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-              >
-                Start 14-Day Free Trial
-              </Link>
-              
-              <div className="space-y-4">
-                <p className="font-semibold text-slate-900 dark:text-white text-sm uppercase tracking-wider mb-4">What's included</p>
-                {plan.features.map(feature => (
-                  <div key={feature} className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span className="text-slate-600 dark:text-slate-300 font-medium">{feature}</span>
-                  </div>
-                ))}
-                {plan.missing.map(feature => (
-                  <div key={feature} className="flex items-center gap-3 opacity-50">
-                    <X className="w-5 h-5 text-slate-400 shrink-0" />
-                    <span className="text-slate-500 dark:text-slate-400 font-medium line-through">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Building2, CreditCard, ShieldAlert, LogOut, Tag, Menu } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentUser, logoutUser } from '@/features/auth/api/auth';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -120,8 +121,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </button>
             <h1 className="text-lg font-semibold text-slate-900 dark:text-white hidden sm:block">Global Administration</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
               SA
             </div>
           </div>
