@@ -6,7 +6,10 @@ import { signToken } from '../utils/jwt.util';
 import { sendPasswordResetEmail } from './email.service';
 
 export const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email })
+    .select('+password')
+    .populate('clinicId', 'subdomain name');
+    
   if (!user || !user.password) {
     throw new Error('Invalid email or password');
   }
@@ -30,7 +33,7 @@ export const loginUser = async (email: string, password: string) => {
 
   const token = signToken({
     userId: user._id.toString(),
-    clinicId: user.clinicId ? user.clinicId.toString() : null,
+    clinicId: user.clinicId ? (user.clinicId as any)._id.toString() : null,
     role: user.role,
     doctorId: (user as any).doctorId ? (user as any).doctorId.toString() : null,
   });

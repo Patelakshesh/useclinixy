@@ -165,9 +165,13 @@ export default function PublicBookingPage() {
       {/* Header */}
       <header className="bg-white dark:bg-[#111] border-b border-slate-200 dark:border-neutral-800 py-4 px-6 sticky top-0 z-50 shadow-sm">
         <div className="max-w-3xl mx-auto flex items-center justify-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md">
-            {clinic.name.charAt(0).toUpperCase()}
-          </div>
+          {clinic.logo ? (
+            <img src={clinic.logo} alt={clinic.name} className="w-10 h-10 rounded-xl object-cover shadow-md border border-slate-200 dark:border-neutral-800 bg-white" />
+          ) : (
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md">
+              {clinic.name.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div>
             <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{clinic.name}</h1>
             <p className="text-xs text-slate-500">{clinic.address}</p>

@@ -56,6 +56,30 @@ export const LoginForm = () => {
     setError(null);
     try {
       const res = await loginUser(data);
+      const userObj = res.data?.user;
+      
+      // 1. Enforce Domain Security
+      const hostname = window.location.hostname;
+      const isLocal = hostname.includes('localhost');
+      const isVercel = hostname.includes('vercel.app');
+      
+      if (!isLocal && !isVercel) {
+        if (userObj?.role === 'SUPER_ADMIN') {
+          if (hostname !== 'useclinixy.online' && hostname !== 'www.useclinixy.online') {
+            throw new Error('Super Admins must log in at the main useclinixy.online portal.');
+          }
+        } else {
+          const expectedDomain = `${userObj?.clinicId?.subdomain}.useclinixy.online`;
+          
+          if (hostname !== expectedDomain && userObj?.clinicId?.subdomain) {
+            // MAGIC: Automatically seamlessly redirect them to their clinic's workspace with the token!
+            window.location.href = `https://${expectedDomain}/auth-sync?token=${res.data.token}`;
+            return; // Stop execution here because the browser is navigating away
+          }
+        }
+      }
+
+      // 2. Proceed with Login
       if (res.data?.token) {
         localStorage.setItem('token', res.data.token);
       }
@@ -63,14 +87,14 @@ export const LoginForm = () => {
       // CRITICAL: Clear the cached error so the next page starts with a clean loading state
       queryClient.removeQueries({ queryKey: ['currentUser'] });
       
-      if (res.data?.user?.role === 'SUPER_ADMIN') {
+      if (userObj?.role === 'SUPER_ADMIN') {
         router.push('/admin/dashboard');
       } else {
         router.push('/dashboard');
       }
       // DO NOT setIsLoading(false) here, so the button stays spinning until Next.js unmounts the page
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to login');
+      setError(err.message || err.response?.data?.message || 'Failed to login');
       setIsLoading(false);
     }
   };

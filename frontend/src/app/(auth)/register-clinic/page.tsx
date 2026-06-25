@@ -39,7 +39,14 @@ export default function RegisterClinic() {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/clinic/register`, data);
       if (res.data.success) {
         toast.success(res.data.message || 'Clinic registered successfully!');
-        router.push('/login');
+        
+        // Redirect them directly to their brand new workspace domain!
+        const isLocal = window.location.hostname.includes('localhost');
+        if (isLocal) {
+          router.push('/login');
+        } else {
+          window.location.href = `https://${data.subdomain}.useclinixy.online/`;
+        }
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to register clinic');
