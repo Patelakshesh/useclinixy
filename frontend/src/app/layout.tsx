@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +17,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://useclinixy.online'),
+  alternates: {
+    canonical: '/',
+  },
   title: 'Clinixy - The Modern Medical Clinic Management Platform',
   description: 'Clinixy is the ultimate SaaS platform for doctors and medical clinics. Automate appointment scheduling, patient management, staff coordination, and billing all in one place.',
   keywords: 'doctor appointment software, clinic management system, medical practice software, online booking for doctors, healthcare SaaS, Clinixy, patient scheduling, medical CRM',
@@ -57,23 +61,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReactQueryProvider>
-          {children}
-        </ReactQueryProvider>
-        <Toaster 
-          position="bottom-right" 
-          toastOptions={{
-            style: {
-              background: '#111',
-              color: '#fff',
-              border: '1px solid #333'
-            },
-          }} 
-        />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ReactQueryProvider>
+            {children}
+          </ReactQueryProvider>
+          <Toaster 
+            position="bottom-right" 
+            toastOptions={{
+              style: {
+                background: '#111',
+                color: '#fff',
+                border: '1px solid #333'
+              },
+            }} 
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

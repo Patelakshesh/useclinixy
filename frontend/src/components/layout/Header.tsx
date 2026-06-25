@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getCurrentUser } from '@/features/auth/api/auth';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface HeaderProps {
   toggleSidebar?: () => void;
@@ -102,6 +103,7 @@ export const Header = ({ toggleSidebar }: HeaderProps) => {
       </div>
 
       <div className="flex items-center gap-5">
+        <ThemeToggle />
         <div className="h-8 w-8 cursor-pointer overflow-hidden rounded-full border border-slate-200 dark:border-neutral-800 ring-2 ring-transparent hover:ring-slate-200 dark:hover:ring-neutral-700 transition-all">
           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Avatar" className="h-full w-full object-cover bg-slate-100 dark:bg-neutral-900" />
         </div>

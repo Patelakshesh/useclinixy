@@ -79,8 +79,10 @@ export default function AdminDashboard() {
                     <div className="font-medium text-slate-900 dark:text-white">{clinic.name}</div>
                     <div className="text-xs text-slate-500 dark:text-neutral-400">{clinic.email}</div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-neutral-300">
-                    useclinixy.vercel.app/booking/{clinic.subdomain}
+                  <td className="px-6 py-4">
+                    <a href={`https://${clinic.subdomain}.useclinixy.online`} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-0.5">
+                      {clinic.subdomain}.useclinixy.online
+                    </a>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600 dark:text-neutral-300">
                     <span className="font-medium">{clinic.subscriptionId?.planId?.name || 'Free Trial'}</span>

@@ -28,14 +28,19 @@ export function middleware(req: NextRequest) {
   // Extract the specific subdomain (e.g., 'apollo' from 'apollo.useclinixy.online')
   const subdomain = isSubdomain ? hostname.split('.')[0] : null;
 
-  // 2. If it is a subdomain and the user is visiting the root path '/', 
-  // rewrite them to the public booking page for that clinic!
-  if (isSubdomain && subdomain && url.pathname === '/') {
-    // Rewrite 'apollo.useclinixy.online/' to '/booking/apollo'
-    return NextResponse.rewrite(new URL(`/booking/${subdomain}`, req.url));
+  // 2. Subdomain Routing Logic
+  if (isSubdomain && subdomain) {
+    // If clinic staff visits the root subdomain, redirect them to the login page
+    if (url.pathname === '/') {
+      return NextResponse.rewrite(new URL('/login', req.url));
+    }
+    
+    // If patients visit the /book path, show them the clinic's public booking page
+    if (url.pathname === '/book' || url.pathname === '/book/') {
+      return NextResponse.rewrite(new URL(`/booking/${subdomain}`, req.url));
+    }
   }
 
-  // 3. For all other routes (like /dashboard, /login), let them pass through normally
-  // so the clinic staff can still log in at 'apollo.useclinixy.online/login'
+  // 3. For all other routes (like /dashboard), let them pass through normally
   return NextResponse.next();
 }

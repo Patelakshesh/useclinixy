@@ -166,7 +166,7 @@ export default function SettingsPage() {
                 {isClinicAdmin && user?.clinicId && (
                   <button 
                     onClick={() => {
-                      const url = `${window.location.origin}/booking/${user.clinicId}`;
+                      const url = `https://${window.location.hostname}/book`;
                       navigator.clipboard.writeText(url);
                       toast.success('Booking link copied to clipboard!');
                     }}
