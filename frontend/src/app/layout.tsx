@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
   title: 'Clinixy - The Modern Medical Clinic Management Platform',
   description: 'Clinixy is the ultimate SaaS platform for doctors and medical clinics. Automate appointment scheduling, patient management, staff coordination, and billing all in one place.',
   keywords: 'doctor appointment software, clinic management system, medical practice software, online booking for doctors, healthcare SaaS, Clinixy, patient scheduling, medical CRM',
