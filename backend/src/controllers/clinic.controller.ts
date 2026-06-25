@@ -13,7 +13,7 @@ export const checkSubdomain = async (req: Request, res: Response, next: NextFunc
       res.status(400).json({ success: false, message: 'Subdomain is required' });
       return;
     }
-    const normalizedSubdomain = subdomain.toLowerCase().trim();
+    const normalizedSubdomain = String(subdomain).toLowerCase().trim();
     const existingClinic = await Clinic.findOne({ subdomain: normalizedSubdomain });
     
     if (existingClinic) {
@@ -78,7 +78,7 @@ export const registerClinic = async (req: Request, res: Response, next: NextFunc
   try {
     const { clinicName, subdomain, address, phone, adminName, adminEmail, adminPassword } = req.body;
 
-    const normalizedSubdomain = subdomain.toLowerCase().trim();
+    const normalizedSubdomain = String(subdomain).toLowerCase().trim();
 
     // Check if subdomain is available
     const existingClinic = await Clinic.findOne({ subdomain: normalizedSubdomain }).session(session);
@@ -142,7 +142,7 @@ export const registerClinic = async (req: Request, res: Response, next: NextFunc
       const now = new Date();
       let endDate = new Date();
 
-      if (defaultPlan.interval === 'DAYS' || defaultPlan.interval === 'DAILY') {
+      if (defaultPlan.interval === 'DAILY') {
         endDate.setDate(now.getDate() + defaultPlan.intervalCount);
       } else if (defaultPlan.interval === 'MONTHLY') {
         endDate.setMonth(now.getMonth() + defaultPlan.intervalCount);

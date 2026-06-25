@@ -94,7 +94,7 @@ export const verifyPayment = async (req: Request, res: Response, next: NextFunct
     // Payment is valid! Upgrade the clinic subscription.
     const now = new Date();
     let periodEnd = new Date();
-    if (plan.interval === 'DAYS' || plan.interval === 'DAILY') {
+    if (plan.interval === 'DAILY') {
       periodEnd.setDate(now.getDate() + plan.intervalCount);
     } else if (plan.interval === 'MONTHLY') {
       periodEnd.setMonth(now.getMonth() + plan.intervalCount);
