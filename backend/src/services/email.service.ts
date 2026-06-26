@@ -13,6 +13,8 @@ const createTransporter = () => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      logger: true, // Enable built-in logger
+      debug: true,  // Enable detailed debug output
     });
   }
 
@@ -24,6 +26,8 @@ const createTransporter = () => {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    logger: true,
+    debug: true,
   });
 };
 
@@ -98,12 +102,19 @@ export const sendPasswordResetEmail = async (to: string, name: string, resetToke
     </html>
   `;
 
-  await transporter.sendMail({
-    from: `"Clinixy" <${process.env.SMTP_USER}>`,
-    to,
-    subject: 'Reset Your Clinixy Password',
-    html,
-  });
+  console.log(`[Email Debug] Attempting to send PASSWORD RESET email to: ${to}`);
+  try {
+    await transporter.sendMail({
+      from: `"Clinixy" <${process.env.SMTP_USER}>`,
+      to,
+      subject: 'Reset Your Clinixy Password',
+      html,
+    });
+    console.log(`[Email Debug] Successfully sent PASSWORD RESET email to: ${to}`);
+  } catch (error) {
+    console.error(`[Email Debug] FATAL ERROR sending PASSWORD RESET email to ${to}:`, error);
+    throw error;
+  }
 };
 
 export const sendWelcomeEmail = async (to: string, name: string, clinicName: string): Promise<void> => {
@@ -131,10 +142,17 @@ export const sendWelcomeEmail = async (to: string, name: string, clinicName: str
     </div>
   `;
 
-  await transporter.sendMail({
-    from: `"Clinixy" <${process.env.SMTP_USER}>`,
-    to,
-    subject: `Welcome to Clinixy — ${clinicName} is ready!`,
-    html,
-  });
+  console.log(`[Email Debug] Attempting to send email to: ${to}`);
+  try {
+    await transporter.sendMail({
+      from: `"Clinixy" <${process.env.SMTP_USER}>`,
+      to,
+      subject: `Welcome to Clinixy — ${clinicName} is ready!`,
+      html,
+    });
+    console.log(`[Email Debug] Successfully sent email to: ${to}`);
+  } catch (error) {
+    console.error(`[Email Debug] FATAL ERROR sending email to ${to}:`, error);
+    throw error;
+  }
 };
