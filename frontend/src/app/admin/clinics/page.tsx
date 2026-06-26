@@ -239,7 +239,7 @@ export default function AdminClinics() {
             
             <p className="text-slate-600 dark:text-neutral-300 mb-6">
               Are you sure you want to permanently delete <span className="font-semibold text-slate-900 dark:text-white">{clinicToDelete.name}</span>? 
-              This will remove them from the platform. (This is a soft delete, meaning the data remains safely in the database for auditing purposes, but the clinic is deactivated and hidden).
+              This will completely remove the clinic and all its associated data (patients, doctors, appointments, etc.) from the platform permanently. This action cannot be undone.
             </p>
             
             <div className="flex gap-3 justify-end">

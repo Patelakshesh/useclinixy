@@ -6,8 +6,12 @@ import SubscriptionPlan from '../models/subscriptionPlan.model';
 import Doctor from '../models/doctor.model';
 import Patient from '../models/patient.model';
 import AuditLog from '../models/auditLog.model';
+import Appointment from '../models/appointment.model';
+import Prescription from '../models/prescription.model';
+import MedicalHistory from '../models/medicalHistory.model';
+import DoctorLeave from '../models/doctorLeave.model';
+import Vitals from '../models/vitals.model';
 import { logAudit } from '../utils/auditLog.util';
-
 export const getAdminDashboardMetrics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const totalClinics = await Clinic.countDocuments();
@@ -59,10 +63,23 @@ export const updateClinicStatus = async (req: Request, res: Response, next: Next
 export const deleteClinic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const clinic = await Clinic.findByIdAndUpdate(id, { status: 'DELETED' }, { new: true });
+    const clinic = await Clinic.findByIdAndDelete(id);
     if (!clinic) { res.status(404).json({ success: false, message: 'Clinic not found' }); return; }
-    logAudit((req as any).user.userId, 'CLINIC_DELETED', { clinicId: id }, null, req.ip);
-    res.status(200).json({ success: true, message: 'Clinic soft deleted successfully' });
+    
+    // Cascading delete for all associated data
+    await User.deleteMany({ clinicId: id });
+    await Doctor.deleteMany({ clinicId: id });
+    await Patient.deleteMany({ clinicId: id });
+    await Appointment.deleteMany({ clinicId: id });
+    await Subscription.deleteMany({ clinicId: id });
+    await Prescription.deleteMany({ clinicId: id });
+    await MedicalHistory.deleteMany({ clinicId: id });
+    await DoctorLeave.deleteMany({ clinicId: id });
+    await Vitals.deleteMany({ clinicId: id });
+    await AuditLog.deleteMany({ clinicId: id });
+    
+    logAudit((req as any).user.userId, 'CLINIC_PERMANENTLY_DELETED', { clinicId: id, name: clinic.name }, null, req.ip);
+    res.status(200).json({ success: true, message: 'Clinic permanently deleted successfully' });
   } catch (error) { next(error); }
 };
 
