@@ -145,7 +145,7 @@ export const sendWelcomeEmail = async (to: string, name: string, clinicName: str
       body: JSON.stringify({
         sender: { name: "Clinixy", email: senderEmail },
         to: [{ email: to, name }],
-        subject: \`Welcome to Clinixy — \${clinicName} is ready!\`,
+        subject: `Welcome to Clinixy — ${clinicName} is ready!`,
         htmlContent: html
       })
     });
