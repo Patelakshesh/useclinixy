@@ -7,6 +7,7 @@ import v1Routes from './routes/v1';
 import { errorHandler } from './middlewares/error.middleware';
 
 const app: Express = express();
+app.set('trust proxy', 1); // Trust first proxy (Render/Vercel)
 
 // Middlewares
 app.use(helmet());
