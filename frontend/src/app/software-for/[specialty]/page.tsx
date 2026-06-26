@@ -29,7 +29,7 @@ export default async function SpecialtyPage({ params }: Props) {
   const specialtyName = specialtyParam.charAt(0).toUpperCase() + specialtyParam.slice(1);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black font-sans text-slate-900 dark:text-neutral-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-black font-sans text-slate-900 dark:text-neutral-100 overflow-x-hidden">
       <Navbar />
       
       <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">

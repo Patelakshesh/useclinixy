@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Calendar as CalendarIcon, Clock, User, Phone, CheckCircle2, ChevronRight, Loader2, Hospital } from 'lucide-react';
@@ -12,10 +12,9 @@ const api = axios.create({
 });
 
 export default function PublicBookingPage() {
-  const params = useParams();
   const router = useRouter();
-  const clinicId = params.slug as string; // slug can be either ID or subdomain
-
+  
+  const [clinicId, setClinicId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [clinic, setClinic] = useState<any>(null);
@@ -31,6 +30,27 @@ export default function PublicBookingPage() {
   const [successData, setSuccessData] = useState<any>(null);
 
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      // Extract subdomain (e.g. "demo.useclinixy.online" -> "demo")
+      const parts = hostname.split('.');
+      let extractedId = '';
+      if (parts.length > 2) {
+        extractedId = parts[0];
+      } else if (parts.length === 2 && hostname.includes('localhost')) {
+        extractedId = parts[0];
+      }
+      
+      if (extractedId && extractedId !== 'www' && extractedId !== 'useclinixy') {
+        setClinicId(extractedId);
+      } else {
+        setError('Invalid booking link. Subdomain missing.');
+        setLoading(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchClinicData = async () => {
@@ -60,7 +80,7 @@ export default function PublicBookingPage() {
   // Fetch booked slots when doctor or date changes
   useEffect(() => {
     const fetchBookedSlots = async () => {
-      if (!selectedDoctor || !selectedDate) return;
+      if (!selectedDoctor || !selectedDate || !clinicId) return;
       try {
         const res = await api.get(`/public/${clinicId}/booked-slots`, {
           params: {

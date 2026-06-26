@@ -60,33 +60,33 @@ export default function Home() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300 group-hover:scale-105">
-              <Activity className="w-6 h-6 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer group">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300 group-hover:scale-105">
+              <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <span className="text-2xl font-black bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent tracking-tight transition-colors">Clinixy</span>
+            <span className="text-xl sm:text-2xl font-black bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent tracking-tight transition-colors">Clinixy</span>
           </div>
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-2 sm:gap-6">
             <ThemeToggle />
             <Link 
               href="/login" 
-              className="hidden sm:block text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-semibold transition-colors"
+              className="text-sm sm:text-base text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-semibold transition-colors"
             >
               Log In
             </Link>
             <Link 
               href="/register-clinic" 
-              className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-full bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold transition-all hover:shadow-xl hover:shadow-slate-900/20 dark:hover:shadow-white/20 hover:-translate-y-0.5 flex items-center gap-2 text-sm sm:text-base"
+              className="px-3 py-1.5 sm:px-6 sm:py-2.5 rounded-full bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold transition-all hover:shadow-xl hover:shadow-slate-900/20 dark:hover:shadow-white/20 hover:-translate-y-0.5 flex items-center gap-1 sm:gap-2 text-xs sm:text-base whitespace-nowrap"
             >
-              Start Free Trial <ArrowRight className="w-4 h-4" />
+              Start Free <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
             </Link>
           </div>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="pt-48 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative min-h-screen flex items-center">
+      <section className="pt-40 sm:pt-48 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative min-h-screen flex items-center">
         {/* Animated Background Gradients */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full overflow-hidden -z-10 pointer-events-none">
           <motion.div 
@@ -95,7 +95,7 @@ export default function Home() {
               opacity: [0.3, 0.5, 0.3],
             }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-20 left-[10%] w-[500px] h-[500px] bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-[100px]" 
+            className="absolute top-20 left-[5%] md:left-[10%] w-64 h-64 md:w-[500px] md:h-[500px] bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-[100px]" 
           />
           <motion.div 
             animate={{ 
@@ -103,17 +103,17 @@ export default function Home() {
               opacity: [0.2, 0.4, 0.2],
             }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute top-40 right-[10%] w-[600px] h-[600px] bg-purple-400/20 dark:bg-purple-600/20 rounded-full blur-[100px]" 
+            className="absolute top-40 right-[5%] md:right-[10%] w-72 h-72 md:w-[600px] md:h-[600px] bg-purple-400/20 dark:bg-purple-600/20 rounded-full blur-[100px]" 
           />
         </div>
 
         <motion.div 
-          className="text-center max-w-5xl mx-auto"
+          className="text-center max-w-5xl mx-auto w-full"
           initial="initial"
           animate="animate"
           variants={staggerContainer}
         >
-          <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold text-sm mb-10 border border-blue-100 dark:border-blue-900/50 shadow-sm shadow-blue-900/5 dark:shadow-none transition-colors">
+          <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold text-sm mb-8 sm:mb-10 border border-blue-100 dark:border-blue-900/50 shadow-sm shadow-blue-900/5 dark:shadow-none transition-colors">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
@@ -121,19 +121,19 @@ export default function Home() {
             Clinixy is Live
           </motion.div>
           
-          <motion.h1 variants={fadeIn} className="text-6xl sm:text-7xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-8 transition-colors">
+          <motion.h1 variants={fadeIn} className="text-4xl sm:text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] sm:leading-[1.05] mb-6 sm:mb-8 transition-colors">
             The Future of <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">Clinic Management</span>
           </motion.h1>
           
-          <motion.p variants={fadeIn} className="text-xl sm:text-2xl text-slate-500 dark:text-slate-400 mb-12 leading-relaxed max-w-3xl mx-auto font-medium transition-colors">
+          <motion.p variants={fadeIn} className="text-lg sm:text-xl md:text-2xl text-slate-500 dark:text-slate-400 mb-10 sm:mb-12 leading-relaxed max-w-3xl mx-auto font-medium transition-colors">
             Automate patient booking, manage doctor schedules, and scale your practice with an intelligent, all-in-one SaaS platform.
           </motion.p>
           
-          <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center gap-5">
+          <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5">
             <Link 
               href="/register-clinic"
-              className="w-full sm:w-auto px-10 py-5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-lg transition-all shadow-2xl shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-1 flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base sm:text-lg transition-all shadow-2xl shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-1 flex items-center justify-center gap-3"
             >
               Start 14-Day Free Trial <ArrowRight className="w-5 h-5" />
             </Link>

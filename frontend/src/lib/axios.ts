@@ -36,7 +36,15 @@ api.interceptors.response.use(
       const status = error.response.status;
       const code = error.response.data?.code;
       
-      if (status === 402 || code === 'SUBSCRIPTION_EXPIRED' || code === 'CLINIC_SUSPENDED') {
+      if (status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
+        }
+      } else if (status === 402 || code === 'SUBSCRIPTION_EXPIRED' || code === 'CLINIC_SUSPENDED') {
         if (typeof window !== 'undefined') {
           if (!window.location.pathname.includes('/dashboard/billing')) {
             window.location.href = '/dashboard/billing?expired=true';
@@ -56,3 +64,18 @@ adminApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+adminApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('adminToken');
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);

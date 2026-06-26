@@ -161,12 +161,16 @@ export default function SettingsPage() {
         <main className="flex-1">
           {activeTab === 'profile' && (
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-black">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Clinic Information</h2>
                 {isClinicAdmin && user?.clinicId && (
                   <button 
                     onClick={() => {
-                      const url = `https://${window.location.hostname}/book`;
+                      const slug = user?.clinicId?.subdomain || user?.clinicId?._id;
+                      const isLocal = window.location.hostname.includes('localhost');
+                      const url = isLocal 
+                        ? `http://${slug}.localhost:3000/book`
+                        : `https://${slug}.useclinixy.online/book`;
                       navigator.clipboard.writeText(url);
                       toast.success('Booking link copied to clipboard!');
                     }}
