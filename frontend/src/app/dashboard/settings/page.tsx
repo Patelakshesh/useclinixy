@@ -20,6 +20,7 @@ export default function SettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [clinicSlug, setClinicSlug] = useState<string | null>(null);
 
   const profileForm = useForm<ClinicProfileFormData>({
     resolver: zodResolver(clinicProfileSchema),
@@ -44,6 +45,7 @@ export default function SettingsPage() {
         try {
           const res = await getClinicProfile();
           if (res.data) {
+            setClinicSlug(res.data.subdomain || res.data._id);
             profileForm.reset({
               name: res.data.name,
               email: res.data.email,
@@ -102,7 +104,7 @@ export default function SettingsPage() {
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setLogoPreview(base64String);
-        profileForm.setValue('logo', base64String, { shouldDirty: true });
+        profileForm.setValue('logo', base64String);
       };
       reader.readAsDataURL(file);
     }
@@ -110,31 +112,33 @@ export default function SettingsPage() {
 
   const handleRemoveLogo = () => {
     setLogoPreview(null);
-    profileForm.setValue('logo', '', { shouldDirty: true });
+    profileForm.setValue('logo', '');
   };
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Settings</h1>
-        <p className="text-sm text-slate-500 dark:text-neutral-400 mt-1">Manage your {isClinicAdmin ? 'clinic profile and ' : ''}security preferences.</p>
+    <div className="mx-auto max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+          Manage your {isClinicAdmin ? 'clinic profile and ' : ''}account settings
+        </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        <aside className="w-full md:w-64 flex-shrink-0">
-          <nav className="flex md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0">
+      <div className="flex flex-col gap-8 md:flex-row">
+        <aside className="w-full md:w-64">
+          <nav className="flex flex-row space-x-2 md:flex-col md:space-x-0 md:space-y-1 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
             {isClinicAdmin && (
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   activeTab === 'profile'
                     ? 'bg-slate-100 text-slate-900 dark:bg-neutral-800 dark:text-white'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-neutral-400 dark:hover:bg-neutral-900/50 dark:hover:text-white'
@@ -146,7 +150,7 @@ export default function SettingsPage() {
             )}
             <button
               onClick={() => setActiveTab('security')}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 activeTab === 'security'
                   ? 'bg-slate-100 text-slate-900 dark:bg-neutral-800 dark:text-white'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-neutral-400 dark:hover:bg-neutral-900/50 dark:hover:text-white'
@@ -163,14 +167,13 @@ export default function SettingsPage() {
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-black">
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Clinic Information</h2>
-                {isClinicAdmin && user?.clinicId && (
+                {isClinicAdmin && clinicSlug && (
                   <button 
                     onClick={() => {
-                      const slug = user?.clinicId?.subdomain || user?.clinicId?._id;
                       const isLocal = window.location.hostname.includes('localhost');
                       const url = isLocal 
-                        ? `http://${slug}.localhost:3000/book`
-                        : `https://${slug}.useclinixy.online/book`;
+                        ? `http://${clinicSlug}.localhost:3000/book`
+                        : `https://${clinicSlug}.useclinixy.online/book`;
                       navigator.clipboard.writeText(url);
                       toast.success('Booking link copied to clipboard!');
                     }}
