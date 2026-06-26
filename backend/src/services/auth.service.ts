@@ -42,7 +42,7 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const forgotPassword = async (email: string, origin?: string) => {
-  const user = await User.findOne({ email, status: { $ne: 'DELETED' } });
+  const user = await User.findOne({ email });
   if (!user) {
     throw new Error('User not found'); // Always throw to prevent email enumeration in real apps, but we handle it gracefully in controller
   }
