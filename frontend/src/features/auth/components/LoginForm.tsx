@@ -42,9 +42,9 @@ export const LoginForm = () => {
     
     if (!isUserLoading && user) {
       if (user.role === 'SUPER_ADMIN') {
-        router.push('/admin/dashboard');
+        window.location.href = '/admin/dashboard';
       } else {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       }
     }
   }, [isUserLoading, user, router]);
@@ -95,9 +95,9 @@ export const LoginForm = () => {
       queryClient.removeQueries({ queryKey: ['currentUser'] });
       
       if (userObj?.role === 'SUPER_ADMIN') {
-        router.push('/admin/dashboard');
+        window.location.href = '/admin/dashboard';
       } else {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       }
       // DO NOT setIsLoading(false) here, so the button stays spinning until Next.js unmounts the page
     } catch (err: any) {

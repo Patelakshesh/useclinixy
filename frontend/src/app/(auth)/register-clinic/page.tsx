@@ -27,6 +27,18 @@ export default function RegisterClinic() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const isLocal = hostname.includes('localhost');
+    const isVercel = hostname.includes('vercel.app');
+    
+    if (!isLocal && !isVercel) {
+      if (hostname !== 'useclinixy.online' && hostname !== 'www.useclinixy.online') {
+        window.location.href = 'https://useclinixy.online/register-clinic';
+      }
+    }
+  }, []);
+
   const { register, handleSubmit, formState: { errors }, watch, setError, clearErrors } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema)
   });
