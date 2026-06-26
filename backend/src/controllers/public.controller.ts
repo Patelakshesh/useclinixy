@@ -10,7 +10,14 @@ import { sendWhatsAppMessage } from '../services/whatsapp.service';
 // Helper to check if clinic has a feature
 const checkClinicFeature = async (clinicId: string, featureName: 'hasOnlineBooking' | 'hasWhatsApp'): Promise<boolean> => {
   let hasFeature = false;
-  const subscription = await Subscription.findOne({ clinicId, status: 'ACTIVE' }).populate('planId');
+  const now = new Date();
+  const subscription = await Subscription.findOne({ 
+    clinicId, 
+    $or: [
+      { status: 'ACTIVE' },
+      { status: 'CANCELLED', currentPeriodEnd: { $gt: now } }
+    ]
+  }).populate('planId');
   
   if (subscription) {
     hasFeature = (subscription.planId as any).features[featureName];

@@ -38,6 +38,7 @@ export default function BillingPage() {
 
   const isTrial = currentSub?.status === 'TRIAL';
   const isExpired = currentSub?.status === 'EXPIRED';
+  const isCancelled = currentSub?.status === 'CANCELLED';
   const isManuallySuspended = currentSub?.clinicStatus === 'SUSPENDED' && !isExpired;
   const planName = currentSub?.plan?.name || 'Starter';
   const expiresAt = currentSub?.currentPeriodEnd ? new Date(currentSub.currentPeriodEnd) : null;
@@ -225,18 +226,18 @@ export default function BillingPage() {
                 </ul>
 
                 <button 
-                  disabled={(isCurrent && !isExpired) || (plan.price === 0 && !isTrial && !isExpired) || processingId !== null}
+                  disabled={(isCurrent && !isExpired && !isCancelled) || (plan.price === 0 && !isTrial && !isExpired && !isCancelled) || processingId !== null}
                   onClick={() => handleUpgrade(plan)}
                   className={`w-full py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
-                    isCurrent && !isExpired
+                    isCurrent && !isExpired && !isCancelled
                       ? 'bg-slate-100 text-slate-400 dark:bg-neutral-800 dark:text-neutral-500 cursor-not-allowed'
-                      : isCurrent && isExpired
+                      : isCurrent && (isExpired || isCancelled)
                       ? 'bg-red-600 text-white hover:bg-red-700'
                       : 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200'
                   }`}
                 >
                   {processingId === plan._id && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isCurrent && !isExpired ? 'Current Plan' : isCurrent && isExpired ? 'Renew Plan' : (plan.price < (currentSub?.plan?.price || 0) ? 'Downgrade to ' + plan.name : 'Upgrade to ' + plan.name)}
+                  {isCurrent && !isExpired && !isCancelled ? 'Current Plan' : isCurrent && (isExpired || isCancelled) ? 'Renew Plan' : (plan.price < (currentSub?.plan?.price || 0) ? 'Downgrade to ' + plan.name : 'Upgrade to ' + plan.name)}
                 </button>
               </div>
             );
