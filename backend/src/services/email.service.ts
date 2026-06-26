@@ -1,42 +1,14 @@
-import nodemailer from 'nodemailer';
-
-const createTransporter = () => {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    return null;
-  }
-  const isGmail = (process.env.SMTP_HOST || 'smtp.gmail.com').includes('gmail');
-  
-  if (isGmail) {
-    return nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      logger: true, // Enable built-in logger
-      debug: true,  // Enable detailed debug output
-    });
-  }
-
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: parseInt(process.env.SMTP_PORT || '587') === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    logger: true,
-    debug: true,
-  });
-};
-
 export const sendPasswordResetEmail = async (to: string, name: string, resetToken: string, origin?: string): Promise<void> => {
   const frontendUrl = origin || process.env.FRONTEND_URL || 'http://localhost:3000';
   const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-  const transporter = createTransporter();
-  if (!transporter) return;
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER;
+
+  if (!apiKey || !senderEmail) {
+    console.log('[Email Debug] Missing BREVO_API_KEY or BREVO_SENDER_EMAIL. Skipping email send.');
+    return;
+  }
 
   const html = `
     <!DOCTYPE html>
@@ -102,14 +74,28 @@ export const sendPasswordResetEmail = async (to: string, name: string, resetToke
     </html>
   `;
 
-  console.log(`[Email Debug] Attempting to send PASSWORD RESET email to: ${to}`);
+  console.log(`[Email Debug] Attempting to send PASSWORD RESET email to: ${to} via Brevo API`);
   try {
-    await transporter.sendMail({
-      from: `"Clinixy" <${process.env.SMTP_USER}>`,
-      to,
-      subject: 'Reset Your Clinixy Password',
-      html,
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': apiKey
+      },
+      body: JSON.stringify({
+        sender: { name: "Clinixy", email: senderEmail },
+        to: [{ email: to, name }],
+        subject: 'Reset Your Clinixy Password',
+        htmlContent: html
+      })
     });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Brevo API Error: ${response.status} ${errorData}`);
+    }
+
     console.log(`[Email Debug] Successfully sent PASSWORD RESET email to: ${to}`);
   } catch (error) {
     console.error(`[Email Debug] FATAL ERROR sending PASSWORD RESET email to ${to}:`, error);
@@ -118,8 +104,13 @@ export const sendPasswordResetEmail = async (to: string, name: string, resetToke
 };
 
 export const sendWelcomeEmail = async (to: string, name: string, clinicName: string): Promise<void> => {
-  const transporter = createTransporter();
-  if (!transporter) return;
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER;
+
+  if (!apiKey || !senderEmail) {
+    console.log('[Email Debug] Missing BREVO_API_KEY or BREVO_SENDER_EMAIL. Skipping email send.');
+    return;
+  }
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
@@ -142,14 +133,28 @@ export const sendWelcomeEmail = async (to: string, name: string, clinicName: str
     </div>
   `;
 
-  console.log(`[Email Debug] Attempting to send email to: ${to}`);
+  console.log(`[Email Debug] Attempting to send Welcome email to: ${to} via Brevo API`);
   try {
-    await transporter.sendMail({
-      from: `"Clinixy" <${process.env.SMTP_USER}>`,
-      to,
-      subject: `Welcome to Clinixy — ${clinicName} is ready!`,
-      html,
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': apiKey
+      },
+      body: JSON.stringify({
+        sender: { name: "Clinixy", email: senderEmail },
+        to: [{ email: to, name }],
+        subject: \`Welcome to Clinixy — \${clinicName} is ready!\`,
+        htmlContent: html
+      })
     });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Brevo API Error: ${response.status} ${errorData}`);
+    }
+
     console.log(`[Email Debug] Successfully sent email to: ${to}`);
   } catch (error) {
     console.error(`[Email Debug] FATAL ERROR sending email to ${to}:`, error);
