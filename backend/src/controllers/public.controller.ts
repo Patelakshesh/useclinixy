@@ -119,7 +119,7 @@ export const getBookedSlots = async (req: Request, res: Response, next: NextFunc
 export const bookPublicAppointment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { clinicId } = req.params;
-    const { doctorId, appointmentDate, appointmentTime, patientName, patientMobile, age, gender } = req.body;
+    const { doctorId, appointmentDate, appointmentTime, patientName, patientMobile, patientEmail, age, gender } = req.body;
 
     const clinic = await findClinic(clinicId as string);
     if (!clinic) {
@@ -148,15 +148,41 @@ export const bookPublicAppointment = async (req: Request, res: Response, next: N
 
     // 2. Find or Create Patient
     let patient = await Patient.findOne({ clinicId: clinic._id, mobileNumber: patientMobile });
+    let isNewPatient = false;
+    
     if (!patient) {
+      isNewPatient = true;
       patient = new Patient({
         clinicId: clinic._id,
         name: patientName,
         mobileNumber: patientMobile,
+        email: patientEmail,
         age: age || 25,
-        gender: gender || 'OTHER'
+        gender: gender || 'OTHER',
+        uhid: `CLX-${Math.floor(100000 + Math.random() * 900000)}`
       });
       await patient.save();
+    } else {
+      if (patientEmail && !patient.email) {
+        // Add email if they didn't have one previously
+        patient.email = patientEmail;
+        await patient.save();
+      }
+      
+      const pastVisits = await Appointment.countDocuments({ 
+        patientId: patient._id, 
+        clinicId: clinic._id, 
+        status: { $in: ['COMPLETED', 'CONFIRMED'] } 
+      });
+      if (pastVisits === 0) {
+        isNewPatient = true;
+      }
+    }
+
+    const doctor = await Doctor.findById(doctorId);
+    let feesApplied = 0;
+    if (doctor) {
+      feesApplied = isNewPatient ? doctor.newPatientFee : (doctor.oldPatientFee || doctor.newPatientFee);
     }
 
     // 3. Create Appointment
@@ -166,6 +192,8 @@ export const bookPublicAppointment = async (req: Request, res: Response, next: N
       doctorId,
       appointmentDate,
       appointmentTime,
+      feesApplied,
+      paymentMode: 'PENDING',
       status: 'CONFIRMED' // Public bookings are auto-confirmed for now
     });
     

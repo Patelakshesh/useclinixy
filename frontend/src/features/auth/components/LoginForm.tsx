@@ -32,11 +32,25 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
+  const [isMainDomain, setIsMainDomain] = useState(true);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('expired') === 'true') {
         setError('Your subscription has expired. Please log in as Clinic Admin to renew.');
+      }
+
+      const hostname = window.location.hostname;
+      const parts = hostname.split('.');
+      let extractedId = '';
+      if (parts.length > 2) {
+        extractedId = parts[0];
+      } else if (parts.length === 2 && hostname.includes('localhost')) {
+        extractedId = parts[0];
+      }
+      if (extractedId && extractedId !== 'www' && extractedId !== 'useclinixy') {
+        setIsMainDomain(false);
       }
     }
     
@@ -169,12 +183,14 @@ export const LoginForm = () => {
           {isLoading ? 'Signing in...' : 'Sign in'}
         </button>
 
-        <p className="text-center text-sm text-slate-500 dark:text-neutral-400 mt-6 pt-4 border-t border-slate-100 dark:border-neutral-800">
-          Don't have an account?{' '}
-          <Link href="/register-clinic" className="text-blue-600 hover:underline font-medium dark:text-blue-400">
-            Start free trial
-          </Link>
-        </p>
+        {isMainDomain && (
+          <p className="text-center text-sm text-slate-500 dark:text-neutral-400 mt-6 pt-4 border-t border-slate-100 dark:border-neutral-800">
+            Don't have an account?{' '}
+            <Link href="/register-clinic" className="text-blue-600 hover:underline font-medium dark:text-blue-400">
+              Start free trial
+            </Link>
+          </p>
+        )}
       </form>
     </motion.div>
   );

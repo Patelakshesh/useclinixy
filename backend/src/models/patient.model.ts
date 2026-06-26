@@ -4,6 +4,7 @@ export interface IPatient extends Document {
   clinicId: mongoose.Types.ObjectId;
   name: string;
   mobileNumber: string;
+  email?: string;
   age: number;
   gender: 'MALE' | 'FEMALE' | 'OTHER';
   address?: string;
@@ -19,6 +20,7 @@ const patientSchema: Schema = new Schema(
     clinicId: { type: Schema.Types.ObjectId, ref: 'Clinic', required: true },
     name: { type: String, required: true, trim: true },
     mobileNumber: { type: String, required: true },
+    email: { type: String, trim: true, lowercase: true },
     age: { type: Number, required: true },
     gender: { type: String, enum: ['MALE', 'FEMALE', 'OTHER'], required: true },
     address: { type: String },

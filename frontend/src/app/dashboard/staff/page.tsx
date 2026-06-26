@@ -115,16 +115,24 @@ export default function StaffPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Full Name</label>
-                <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm dark:text-white" placeholder="John Doe" />
+                <input required disabled={!!editingId || form.role === 'DOCTOR'} value={form.name} onChange={e => setForm({...form, name: e.target.value})} className={`w-full px-3 py-2 border rounded-lg text-sm ${!!editingId || form.role === 'DOCTOR' ? 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-500 cursor-not-allowed' : 'bg-slate-50 border-slate-200 dark:bg-neutral-900 dark:border-neutral-800 dark:text-white'}`} placeholder="John Doe" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Email Address</label>
-                <input required type="email" disabled={!!editingId} value={form.email} onChange={e => setForm({...form, email: e.target.value})} className={`w-full px-3 py-2 rounded-lg text-sm border ${editingId ? 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-500 cursor-not-allowed' : 'bg-slate-50 border-slate-200 dark:bg-neutral-900 dark:border-neutral-800 dark:text-white'}`} placeholder="john@clinic.com" />
+                <input required type="email" disabled={!!editingId || form.role === 'DOCTOR'} value={form.email} onChange={e => setForm({...form, email: e.target.value})} className={`w-full px-3 py-2 rounded-lg text-sm border ${!!editingId || form.role === 'DOCTOR' ? 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-500 cursor-not-allowed' : 'bg-slate-50 border-slate-200 dark:bg-neutral-900 dark:border-neutral-800 dark:text-white'}`} placeholder="john@clinic.com" />
                 {editingId && <p className="text-[10px] text-slate-500 mt-1">Email cannot be changed.</p>}
+                {!editingId && form.role === 'DOCTOR' && <p className="text-[10px] text-slate-500 mt-1">Auto-filled from Doctor profile.</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Role</label>
-                <select value={form.role} onChange={e => setForm({...form, role: e.target.value})} className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm dark:text-white">
+                <select value={form.role} onChange={e => {
+                  const role = e.target.value;
+                  if (role !== 'DOCTOR') {
+                    setForm({...form, role, doctorId: '', name: '', email: ''});
+                  } else {
+                    setForm({...form, role});
+                  }
+                }} className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm dark:text-white">
                   <option value="RECEPTIONIST">Receptionist (Front Desk)</option>
                   <option value="DOCTOR">Doctor</option>
                   <option value="CLINIC_ADMIN">Clinic Admin (Full Access)</option>
@@ -133,7 +141,15 @@ export default function StaffPage() {
               {form.role === 'DOCTOR' && (
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1.5">Link to Doctor Profile</label>
-                  <select required value={form.doctorId} onChange={e => setForm({...form, doctorId: e.target.value})} className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm dark:text-white">
+                  <select required value={form.doctorId} onChange={e => {
+                    const docId = e.target.value;
+                    const doc = doctorsData?.data?.find((d: any) => d._id === docId);
+                    if (doc && !editingId) {
+                      setForm({...form, doctorId: docId, name: doc.name, email: doc.email});
+                    } else {
+                      setForm({...form, doctorId: docId});
+                    }
+                  }} className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-sm dark:text-white">
                     <option value="">Select a doctor...</option>
                     {doctorsData?.data?.map((d: any) => (
                       <option key={d._id} value={d._id}>Dr. {d.name} ({d.specialization})</option>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Calendar as CalendarIcon, Clock, User, Phone, CheckCircle2, ChevronRight, Loader2, Hospital } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, Phone, Mail, CheckCircle2, ChevronRight, Loader2, Hospital } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 
 const api = axios.create({
@@ -25,7 +25,7 @@ export default function PublicBookingPage() {
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>('');
-  const [patientDetails, setPatientDetails] = useState({ name: '', phone: '', age: '', gender: 'MALE' });
+  const [patientDetails, setPatientDetails] = useState({ name: '', phone: '', email: '', age: '', gender: 'MALE' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any>(null);
 
@@ -126,6 +126,7 @@ export default function PublicBookingPage() {
         appointmentTime: selectedTime,
         patientName: patientDetails.name,
         patientMobile: patientDetails.phone,
+        patientEmail: patientDetails.email,
         age: Number(patientDetails.age) || 25,
         gender: patientDetails.gender
       });
@@ -155,7 +156,7 @@ export default function PublicBookingPage() {
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
     daySchedule.shifts.forEach((shift: any) => {
-      // Very basic 30-min interval generator for the shift
+      // Very basic 15-min interval generator for the shift
       let current = new Date(`2000-01-01T${shift.startTime}`);
       const end = new Date(`2000-01-01T${shift.endTime}`);
       while (current < end) {
@@ -172,7 +173,7 @@ export default function PublicBookingPage() {
           slots.push(timeString);
         }
         
-        current.setMinutes(current.getMinutes() + 30);
+        current.setMinutes(current.getMinutes() + 15);
       }
     });
     return slots;
@@ -380,13 +381,33 @@ export default function PublicBookingPage() {
                       type="tel" 
                       required
                       pattern="[0-9]{10}"
+                      maxLength={10}
+                      title="Mobile number must be exactly 10 digits"
                       value={patientDetails.phone}
-                      onChange={e => setPatientDetails({...patientDetails, phone: e.target.value})}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        setPatientDetails({...patientDetails, phone: val});
+                      }}
                       className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all dark:text-white"
                       placeholder="9876543210"
                     />
                   </div>
                   <p className="text-xs text-slate-500 mt-1 ml-1">We'll send your booking confirmation here.</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input 
+                      type="email" 
+                      required
+                      value={patientDetails.email}
+                      onChange={e => setPatientDetails({...patientDetails, email: e.target.value})}
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all dark:text-white"
+                      placeholder="john@example.com"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

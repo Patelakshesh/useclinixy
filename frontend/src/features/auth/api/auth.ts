@@ -15,8 +15,8 @@ export const getCurrentUser = async () => {
   return response.data.data;
 };
 
-export const forgotPassword = async (email: string) => {
-  const response = await api.post('/auth/forgot-password', { email });
+export const forgotPassword = async (email: string, origin?: string) => {
+  const response = await api.post('/auth/forgot-password', { email, origin });
   return response.data;
 };
 

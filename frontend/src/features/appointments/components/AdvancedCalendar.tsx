@@ -166,7 +166,7 @@ export const AdvancedCalendar = ({ doctors }: { doctors: any[] }) => {
                   {dayAppointments.map(app => {
                     const [hour, min] = app.appointmentTime.split(':').map(Number);
                     const top = ((hour - 8) * 64) + ((min / 60) * 64);
-                    const height = ((app.duration || 30) / 60) * 64;
+                    const height = ((app.duration || 15) / 60) * 64;
                     if (hour < 8 || hour >= 21) return null; // Outside visible hours
                     
                     return (

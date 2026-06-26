@@ -41,22 +41,23 @@ export const loginUser = async (email: string, password: string) => {
   return { user: userObj, token };
 };
 
-export const forgotPassword = async (email: string) => {
-  const user = await User.findOne({ email });
+export const forgotPassword = async (email: string, origin?: string) => {
+  const user = await User.findOne({ email, status: { $ne: 'DELETED' } });
   if (!user) {
-    throw new Error('User not found');
+    throw new Error('User not found'); // Always throw to prevent email enumeration in real apps, but we handle it gracefully in controller
   }
 
+  // Generate Reset Token
   const resetToken = crypto.randomBytes(32).toString('hex');
   const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
   user.resetPasswordToken = hashedToken;
-  user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+  user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
   await user.save();
 
   // Send real password reset email
   try {
-    await sendPasswordResetEmail(user.email, (user as any).name || user.email, resetToken);
+    await sendPasswordResetEmail(user.email, (user as any).name || user.email, resetToken, origin);
   } catch (emailErr) {
     console.error('[Email] Failed to send password reset email:', emailErr);
     // Don't throw — the token was saved, admin can retrieve from logs in dev

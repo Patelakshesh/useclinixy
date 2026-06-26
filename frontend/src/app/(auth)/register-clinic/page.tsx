@@ -14,7 +14,7 @@ import Link from 'next/link';
 const registerSchema = z.object({
   clinicName: z.string().min(3, 'Clinic name is required'),
   subdomain: z.string().min(3, 'Subdomain must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed'),
-  address: z.string().min(5, 'Address is required'),
+  address: z.string().min(2, 'Address is required'),
   phone: z.string().regex(/^\d{10}$/, 'Must be exactly 10 digits'),
   adminName: z.string().min(2, 'Name is required'),
   adminEmail: z.string().email('Valid email is required'),
@@ -88,7 +88,7 @@ export default function RegisterClinic() {
         if (isLocal) {
           router.push('/login');
         } else {
-          window.location.href = `https://${data.subdomain}.useclinixy.online/`;
+          window.location.href = `https://${data.subdomain}.useclinixy.online/login`;
         }
       }
     } catch (error: any) {

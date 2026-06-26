@@ -44,8 +44,8 @@ export const logout = async (req: Request, res: Response, next: NextFunction): P
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { email } = req.body;
-    await forgotPasswordService(email);
+    const { email, origin } = req.body;
+    await forgotPasswordService(email, origin);
     // SECURITY FIX: Token is never returned in API response. It is sent via email only.
     res.status(200).json({ success: true, message: 'If this email is registered, a password reset link has been sent.' });
   } catch (error: any) {

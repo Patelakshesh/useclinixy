@@ -25,7 +25,7 @@ export const ForgotPasswordForm = () => {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true);
     try {
-      await forgotPassword(data.email);
+      await forgotPassword(data.email, window.location.origin);
       setIsSuccess(true);
       toast.success('Password reset link sent to your email');
     } catch (err: any) {
