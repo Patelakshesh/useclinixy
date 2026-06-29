@@ -16,12 +16,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   return {
     title: `Best Clinic Management Software for ${specialtyName} | Clinixy`,
-    description: `Automate your ${specialtyParam} practice with Clinixy. The ultimate management software tailored for ${specialtyParam}. Start your 14-day free trial.`,
+    description: `Automate your ${specialtyParam} practice with Clinixy. The best clinic management software for ${specialtyParam} in India. Online booking, EMR, billing. Start free.`,
+    keywords: [
+      `clinic management software for ${specialtyParam}`,
+      `best clinic software for ${specialtyParam}`,
+      `${specialtyParam} clinic management system`,
+      `${specialtyParam} appointment booking software`,
+      `${specialtyParam} EMR software India`,
+      `${specialtyParam} practice management software`,
+      `clinic software for ${specialtyParam} India`,
+      'clinic management software India',
+      'doctor appointment booking system',
+      'patient management software India',
+    ],
     alternates: {
       canonical: `https://useclinixy.online/software-for/${specialtyParam}`,
-    }
+    },
+    openGraph: {
+      title: `Best Clinic Management Software for ${specialtyName} | Clinixy`,
+      description: `The best clinic management software for ${specialtyParam} in India. Online booking, EMR, billing. Start free 14-day trial.`,
+      url: `https://useclinixy.online/software-for/${specialtyParam}`,
+      siteName: 'Clinixy',
+      type: 'website',
+      images: [{ url: '/opengraph-image.png', width: 1200, height: 630, alt: `Clinixy for ${specialtyName}` }],
+    },
   };
 }
+
 
 export default async function SpecialtyPage({ params }: Props) {
   const resolvedParams = await params;

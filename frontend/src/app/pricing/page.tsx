@@ -4,12 +4,30 @@ import { ArrowRight, Check, Zap } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
-  title: 'Pricing - Clinixy | Affordable Clinic Management Software',
-  description: 'Simple, transparent pricing for clinics of all sizes. Start your 14-day free trial today. Manage appointments, patients, and billing with Clinixy.',
+  title: 'Pricing - Clinixy | Affordable Clinic Management Software India',
+  description: 'Simple, transparent pricing for clinics of all sizes in India. Start your 14-day free trial today. No credit card required.',
+  keywords: [
+    'clinic management software pricing India',
+    'affordable clinic management software',
+    'clinic software price India',
+    'best clinic software plans',
+    'clinic management software for small clinics',
+    'doctor appointment software cost',
+    'Practo alternative affordable',
+  ],
   alternates: {
     canonical: 'https://useclinixy.online/pricing',
-  }
+  },
+  openGraph: {
+    title: 'Pricing - Clinixy | Affordable Clinic Management Software',
+    description: 'Simple, transparent pricing for Indian clinics. Start your 14-day free trial. No credit card required.',
+    url: 'https://useclinixy.online/pricing',
+    siteName: 'Clinixy',
+    type: 'website',
+    images: [{ url: '/opengraph-image.png', width: 1200, height: 630, alt: 'Clinixy Pricing Plans' }],
+  },
 };
+
 
 export default function PricingPage() {
   return (

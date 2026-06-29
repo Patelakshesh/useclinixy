@@ -23,7 +23,7 @@ export const blogPosts: BlogPost[] = [
     author: 'Clinixy Team',
     authorRole: 'Healthcare Software Experts',
     coverEmoji: '📅',
-    tags: ['clinic management', 'patient management', 'appointment booking', 'doctor software'],
+    tags: ['clinic management software India', 'patient appointment scheduling software', 'doctor appointment booking system', 'patient reminder system', 'online booking system for doctors', 'how to reduce patient no shows', 'OPD management software', 'clinic appointment management system'],
     content: `
       <h2>Why Patient No-Shows Are Destroying Your Clinic's Revenue</h2>
       <p>In India, the average clinic loses between ₹15,000 to ₹50,000 every single month because of patient no-shows. A patient books an appointment, the doctor blocks that time slot, and then the patient simply does not show up — leaving an empty chair and zero revenue.</p>
@@ -69,7 +69,7 @@ export const blogPosts: BlogPost[] = [
     author: 'Clinixy Team',
     authorRole: 'Healthcare Software Experts',
     coverEmoji: '🏥',
-    tags: ['emr software', 'electronic medical records', 'digital health', 'clinic management software'],
+    tags: ['EMR software India', 'electronic medical records software', 'EHR software for clinics', 'digital patient records management', 'ABDM compliant EMR software', 'paperless clinic management', 'digitize clinic records India', 'patient management software India'],
     content: `
       <h2>The Hidden Cost of Paper Records in Indian Clinics</h2>
       <p>Walk into almost any clinic in a tier-2 or tier-3 city in India, and you will see the same scene: rows of dusty files, a receptionist searching frantically through stacks of paper to find a patient's previous prescription, and a doctor struggling to remember what medication was given to a patient 8 months ago.</p>
@@ -117,7 +117,7 @@ export const blogPosts: BlogPost[] = [
     author: 'Clinixy Team',
     authorRole: 'Healthcare Software Experts',
     coverEmoji: '👨‍⚕️',
-    tags: ['multi doctor clinic', 'polyclinic management', 'doctor appointment booking system', 'clinic management software india'],
+    tags: ['multi specialty clinic management software', 'polyclinic management software', 'clinic management software for doctors', 'clinic staff management software', 'medical practice management software', 'cloud based clinic management software', 'clinic billing software', 'best clinic management software'],
     content: `
       <h2>The Challenge of Running a Multi-Doctor Clinic</h2>
       <p>Managing a polyclinic or a clinic with multiple specialists is significantly more complex than running a single-doctor practice. You now have to coordinate the individual schedules of multiple doctors, manage separate patient queues, ensure each doctor's billing is tracked separately, and prevent double-bookings — all while keeping the front desk from becoming completely overwhelmed.</p>

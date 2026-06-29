@@ -122,8 +122,8 @@ export default function Home() {
           </motion.div>
           
           <motion.h1 variants={fadeIn} className="text-4xl sm:text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] sm:leading-[1.05] mb-6 sm:mb-8 transition-colors">
-            The Future of <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">Clinic Management</span>
+            India&apos;s Best <br className="hidden sm:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">Clinic Management Software</span>
           </motion.h1>
           
           <motion.p variants={fadeIn} className="text-lg sm:text-xl md:text-2xl text-slate-500 dark:text-slate-400 mb-10 sm:mb-12 leading-relaxed max-w-3xl mx-auto font-medium transition-colors">
@@ -324,8 +324,10 @@ export default function Home() {
             <ul className="space-y-3 text-sm font-medium text-slate-500 dark:text-slate-400">
               <li><Link href="/software-for/dentists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Dentists</Link></li>
               <li><Link href="/software-for/pediatricians" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Pediatricians</Link></li>
-              <li><Link href="/software-for/chiropractors" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Chiropractors</Link></li>
-              <li><Link href="/software-for/physiotherapists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Physiotherapists</Link></li>
+              <li><Link href="/software-for/dermatologists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Dermatologists</Link></li>
+              <li><Link href="/software-for/cardiologists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Cardiologists</Link></li>
+              <li><Link href="/software-for/gynecologists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Gynecologists</Link></li>
+              <li><Link href="/software-for/general-physicians" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for General Physicians</Link></li>
             </ul>
           </div>
 
@@ -333,6 +335,8 @@ export default function Home() {
             <h4 className="font-bold text-slate-900 dark:text-white mb-4">Product</h4>
             <ul className="space-y-3 text-sm font-medium text-slate-500 dark:text-slate-400">
               <li><Link href="/pricing" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Pricing</Link></li>
+              <li><Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</Link></li>
+              <li><Link href="/faq" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">FAQ</Link></li>
               <li><Link href="/login" className="hover:text-slate-900 dark:hover:text-white transition-colors">Login</Link></li>
               <li><Link href="/register-clinic" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Register Clinic</Link></li>
             </ul>
