@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: '%s | Clinixy',
     default: 'Clinixy - The Modern Medical Clinic Management Platform',
   },
-  description: 'Clinixy is the ultimate SaaS platform for doctors and medical clinics. Automate appointment scheduling, patient management, staff coordination, and billing all in one place.',
+  description: 'Clinixy is the ultimate SaaS platform for doctors. Automate appointment scheduling, patient management, and clinic billing in one secure place.',
   keywords: 'doctor appointment software, clinic management system, medical practice software, online booking for doctors, healthcare SaaS, Clinixy, patient scheduling, medical CRM',
   authors: [{ name: 'Clinixy' }],
   creator: 'Clinixy',
