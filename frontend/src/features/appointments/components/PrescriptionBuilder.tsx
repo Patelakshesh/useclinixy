@@ -93,13 +93,14 @@ export const PrescriptionBuilder = ({ appointment, onBack }: { appointment: any,
   }
 
   if (printMode) {
-    const printMedicines = getValues('medicines') || [];
+    const allMedicines = getValues('medicines') || [];
+    const printMedicines = allMedicines.filter((med: any) => med.name && med.name.trim() !== '');
     const printInstructions = getValues('instructions');
     const patient = fetchedPrescription?.patientId || appointment.patientId;
     const doctor = fetchedPrescription?.doctorId || appointment.doctorId;
 
     return (
-      <div className="bg-white dark:bg-white text-black p-8 rounded-xl h-[80vh] overflow-y-auto print:h-auto print:overflow-visible print:p-0 print:m-0">
+      <div className="bg-white dark:bg-white text-black p-8 rounded-xl h-[80vh] overflow-y-auto print:h-auto print:overflow-visible">
         <div className="flex justify-between items-start mb-8 border-b pb-4 border-slate-200">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">{doctor?.name}</h1>
@@ -111,7 +112,7 @@ export const PrescriptionBuilder = ({ appointment, onBack }: { appointment: any,
           </div>
         </div>
         
-        <div className="mb-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <div className="mb-8 p-4 rounded-lg print:p-0 print:border-none print:bg-transparent border border-slate-200 bg-slate-50">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
             <div><span className="text-slate-500">Patient Name:</span> <span className="font-semibold block">{patient?.name || 'N/A'}</span></div>
             <div><span className="text-slate-500">Age / Gender:</span> <span className="font-semibold block">{patient?.age || '-'} / {patient?.gender || '-'}</span></div>
