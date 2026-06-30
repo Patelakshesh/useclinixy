@@ -54,11 +54,5 @@ export function middleware(req: NextRequest) {
   if (path === '/') {
     return NextResponse.rewrite(new URL('/book', req.url));
   }
-  
-  // Also protect the dashboard from being accessed via the patient portal subdomain (optional but good practice)
-  if (path.startsWith('/dashboard') || path.startsWith('/admin')) {
-    return NextResponse.redirect(new URL(`https://useclinixy.online${path}`, req.url));
-  }
-
   return NextResponse.next();
 }
