@@ -99,7 +99,7 @@ export const PrescriptionBuilder = ({ appointment, onBack }: { appointment: any,
     const doctor = fetchedPrescription?.doctorId || appointment.doctorId;
 
     return (
-      <div className="bg-white dark:bg-white text-black p-8 rounded-xl h-[80vh] overflow-y-auto">
+      <div className="bg-white dark:bg-white text-black p-8 rounded-xl h-[80vh] overflow-y-auto print:h-auto print:overflow-visible print:p-0 print:m-0">
         <div className="flex justify-between items-start mb-8 border-b pb-4 border-slate-200">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">{doctor?.name}</h1>
