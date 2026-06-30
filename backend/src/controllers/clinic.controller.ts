@@ -16,6 +16,10 @@ export const checkSubdomain = async (req: Request, res: Response, next: NextFunc
     const normalizedSubdomain = String(subdomain).toLowerCase().trim();
     const existingClinic = await Clinic.findOne({ subdomain: normalizedSubdomain });
     
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
     if (existingClinic) {
       res.status(200).json({ success: true, available: false, message: 'Subdomain already taken' });
     } else {

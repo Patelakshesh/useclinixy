@@ -57,7 +57,7 @@ export default function RegisterClinic() {
     const timer = setTimeout(async () => {
       setCheckingSubdomain(true);
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/clinic/check-subdomain/${subdomain}`);
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/clinic/check-subdomain/${subdomain}?t=${Date.now()}`);
         if (res.data.available) {
           setSubdomainAvailable(true);
           clearErrors('subdomain');
