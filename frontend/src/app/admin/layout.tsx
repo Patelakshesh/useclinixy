@@ -26,6 +26,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const handleLogout = async () => {
     try {
       localStorage.removeItem('token');
+      localStorage.removeItem('adminToken');
       await logoutUser();
       queryClient.removeQueries({ queryKey: ['currentUser'] });
     } catch (error) {

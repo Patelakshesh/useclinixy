@@ -103,6 +103,9 @@ export const LoginForm = () => {
       // 2. Proceed with Login
       if (res.data?.token) {
         localStorage.setItem('token', res.data.token);
+        if (userObj?.role === 'SUPER_ADMIN') {
+          localStorage.setItem('adminToken', res.data.token);
+        }
       }
       
       // CRITICAL: Clear the cached error so the next page starts with a clean loading state
