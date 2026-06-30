@@ -115,7 +115,7 @@ export const LoginForm = () => {
       }
       // DO NOT setIsLoading(false) here, so the button stays spinning until Next.js unmounts the page
     } catch (err: any) {
-      setError(err.message || err.response?.data?.message || 'Failed to login');
+      setError(err.response?.data?.message || err.message || 'Failed to login');
       setIsLoading(false);
     }
   };
