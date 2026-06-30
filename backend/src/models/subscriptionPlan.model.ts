@@ -13,6 +13,7 @@ export interface ISubscriptionPlan extends Document {
     maxPatients: number;
     hasWhatsApp: boolean;
     hasOnlineBooking: boolean;
+    hasGoogleMapsSetup: boolean;
   };
   isActive: boolean;
   isDefault: boolean;
@@ -36,6 +37,7 @@ const subscriptionPlanSchema = new Schema<ISubscriptionPlan>(
       maxPatients: { type: Number, default: 100 },
       hasWhatsApp: { type: Boolean, default: false },
       hasOnlineBooking: { type: Boolean, default: false },
+      hasGoogleMapsSetup: { type: Boolean, default: false },
     },
     isActive: { type: Boolean, default: true },
     isDefault: { type: Boolean, default: false },

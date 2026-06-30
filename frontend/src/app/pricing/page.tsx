@@ -68,6 +68,10 @@ export default function PricingPage() {
                 <Check className="w-5 h-5 text-blue-600 shrink-0" />
                 <span>Public Booking Portal</span>
               </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-indigo-600 shrink-0" />
+                <span className="font-medium text-indigo-600 dark:text-indigo-400">Free Google Maps Setup</span>
+              </li>
             </ul>
             <Link href="/register-clinic" className="w-full py-3 px-4 bg-slate-900 dark:bg-white text-white dark:text-black font-bold text-center rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
               Start Free Trial
@@ -104,6 +108,10 @@ export default function PricingPage() {
                 <Check className="w-5 h-5 text-blue-600 shrink-0" />
                 <span>Priority Support</span>
               </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-indigo-600 shrink-0" />
+                <span className="font-medium text-indigo-600 dark:text-indigo-400">Free Google Maps Setup</span>
+              </li>
             </ul>
             <Link href="/register-clinic" className="w-full py-3 px-4 bg-blue-600 text-white font-bold text-center rounded-xl hover:bg-blue-700 transition-colors">
               Start Free Trial
@@ -136,6 +144,10 @@ export default function PricingPage() {
               <li className="flex items-start gap-3">
                 <Check className="w-5 h-5 text-blue-600 shrink-0" />
                 <span>Dedicated Account Manager</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-indigo-600 shrink-0" />
+                <span className="font-medium text-indigo-600 dark:text-indigo-400">Free Google Maps Setup</span>
               </li>
             </ul>
             <Link href="/register-clinic" className="w-full py-3 px-4 bg-slate-900 dark:bg-white text-white dark:text-black font-bold text-center rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">

@@ -10,7 +10,7 @@ const defaultForm = {
   name: '', price: 0, discountPrice: 0, currency: 'INR', interval: 'MONTHLY', intervalCount: 1, priceId: 'plan_manual',
   isActive: true,
   isDefault: false,
-  features: { maxDoctors: 1, maxPatients: 100, hasWhatsApp: false, hasOnlineBooking: false },
+  features: { maxDoctors: 1, maxPatients: 100, hasWhatsApp: false, hasOnlineBooking: false, hasGoogleMapsSetup: false },
 };
 
 export default function AdminPlansPage() {
@@ -44,7 +44,7 @@ export default function AdminPlansPage() {
 
   const handleEdit = (plan: any) => {
     setEditingPlan(plan);
-    setForm({ name: plan.name, price: plan.price, discountPrice: plan.discountPrice || 0, currency: plan.currency, interval: plan.interval, intervalCount: plan.intervalCount || 1, priceId: plan.priceId, isActive: plan.isActive, isDefault: plan.isDefault || false, features: { ...plan.features } });
+    setForm({ name: plan.name, price: plan.price, discountPrice: plan.discountPrice || 0, currency: plan.currency, interval: plan.interval, intervalCount: plan.intervalCount || 1, priceId: plan.priceId, isActive: plan.isActive, isDefault: plan.isDefault || false, features: { ...plan.features, hasGoogleMapsSetup: plan.features.hasGoogleMapsSetup || false } });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -160,6 +160,11 @@ export default function AdminPlansPage() {
                 <span className="text-sm text-slate-700 dark:text-neutral-300 font-medium flex items-center gap-1.5"><Globe className="w-4 h-4 text-blue-500" /> Public Booking Portal</span>
               </label>
               <label className="flex items-center gap-2.5 cursor-pointer">
+                <input type="checkbox" checked={form.features.hasGoogleMapsSetup} onChange={e => setForm({ ...form, features: { ...form.features, hasGoogleMapsSetup: e.target.checked } })}
+                  className="w-4 h-4 rounded accent-indigo-600" />
+                <span className="text-sm text-slate-700 dark:text-neutral-300 font-medium flex items-center gap-1.5"><Globe className="w-4 h-4 text-indigo-500" /> Google Maps Setup</span>
+              </label>
+              <label className="flex items-center gap-2.5 cursor-pointer">
                 <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })}
                   className="w-4 h-4 rounded accent-blue-600" />
                 <span className="text-sm text-slate-700 dark:text-neutral-300 font-medium">Plan is Active</span>
@@ -221,7 +226,10 @@ export default function AdminPlansPage() {
                   <MessageSquare className="w-4 h-4 shrink-0" /> WhatsApp Notifications
                 </li>
                 <li className={`flex items-center gap-2 ${plan.features.hasOnlineBooking ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-neutral-600 line-through'}`}>
-                  <Globe className="w-4 h-4 shrink-0" /> Public Booking Portal
+                  {plan.features.hasOnlineBooking ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />} Public Booking Portal
+                </li>
+                <li className={`flex items-center gap-2 ${plan.features.hasGoogleMapsSetup ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-neutral-600 line-through'}`}>
+                  {plan.features.hasGoogleMapsSetup ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />} Google Maps Setup
                 </li>
               </ul>
 

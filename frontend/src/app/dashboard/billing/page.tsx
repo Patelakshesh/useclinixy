@@ -223,6 +223,16 @@ export default function BillingPage() {
                       Public Booking Portal
                     </span>
                   </li>
+                  <li className="flex items-start gap-3">
+                    {plan.features.hasGoogleMapsSetup ? (
+                      <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    ) : (
+                      <AlertCircle className="w-5 h-5 text-slate-300 dark:text-neutral-600 shrink-0" />
+                    )}
+                    <span className={`text-sm font-medium ${plan.features.hasGoogleMapsSetup ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-neutral-600 line-through'}`}>
+                      Free Google Maps Setup
+                    </span>
+                  </li>
                 </ul>
 
                 <button 
