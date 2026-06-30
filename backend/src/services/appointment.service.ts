@@ -82,7 +82,7 @@ export const getAppointments = async (clinicId: string, filter: any = {}, skip =
   const [data, total] = await Promise.all([
     Appointment.find(query)
       .populate('doctorId', 'name specialization')
-      .populate('patientId', 'name mobileNumber')
+      .populate('patientId', 'name mobileNumber age gender bloodGroup')
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 }),
@@ -100,7 +100,7 @@ export const getCalendarAppointments = async (clinicId: string, startDate: strin
 
   return await Appointment.find(query)
     .populate('doctorId', 'name specialization')
-    .populate('patientId', 'name mobileNumber')
+    .populate('patientId', 'name mobileNumber age gender bloodGroup')
     .sort({ appointmentDate: 1, appointmentTime: 1 });
 };
 

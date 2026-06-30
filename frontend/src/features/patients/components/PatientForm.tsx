@@ -9,9 +9,9 @@ const schema = z.object({
   age: z.number().min(0, 'Must be positive'),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
   address: z.string().optional(),
-  height: z.number().min(1, 'Required'),
-  weight: z.number().min(1, 'Required'),
-  bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
+  height: z.preprocess((val) => isNaN(Number(val)) || val === '' ? undefined : Number(val), z.number().optional()),
+  weight: z.preprocess((val) => isNaN(Number(val)) || val === '' ? undefined : Number(val), z.number().optional()),
+  bloodGroup: z.preprocess((val) => val === '' ? undefined : val, z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional()),
 });
 
 type FormData = z.infer<typeof schema>;
