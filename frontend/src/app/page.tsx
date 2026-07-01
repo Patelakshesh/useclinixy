@@ -324,6 +324,7 @@ export default function Home() {
             <ul className="space-y-3 text-sm font-medium text-slate-500 dark:text-slate-400">
               <li><Link href="/software-for/dentists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Dentists</Link></li>
               <li><Link href="/software-for/pediatricians" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Pediatricians</Link></li>
+              <li><Link href="/software-for/physiotherapy" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Physiotherapists</Link></li>
               <li><Link href="/software-for/dermatologists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Dermatologists</Link></li>
               <li><Link href="/software-for/cardiologists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Cardiologists</Link></li>
               <li><Link href="/software-for/gynecologists" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Software for Gynecologists</Link></li>
