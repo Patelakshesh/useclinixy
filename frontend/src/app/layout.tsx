@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from 'react-hot-toast';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import WakeUpBackend from '@/components/WakeUpBackend';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -158,6 +159,7 @@ export default function RootLayout({
               },
             }} 
           />
+          <WakeUpBackend />
         </ThemeProvider>
       </body>
     </html>
