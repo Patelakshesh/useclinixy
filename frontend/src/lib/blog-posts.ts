@@ -152,8 +152,95 @@ export const blogPosts: BlogPost[] = [
       <p>Whether you run a 2-doctor family clinic or a 15-specialist polyclinic, Clinixy scales to fit your needs. <a href="/register-clinic">Start your free 14-day trial today.</a></p>
     `,
   },
+  {
+    slug: 'best-free-clinic-management-software-2025',
+    title: 'Best Free Clinic Management Software in 2025 — Complete Guide',
+    description: 'Looking for free clinic management software? Discover the best options for doctors and small clinics in India, Philippines, and Hong Kong. Manage appointments, patients, and billing without expensive subscriptions.',
+    category: 'Clinic Management',
+    readTime: '6 min read',
+    publishedAt: '2025-07-01',
+    author: 'Clinixy Team',
+    authorRole: 'Healthcare Software Experts',
+    coverEmoji: '💊',
+    tags: ['free clinic management software', 'best clinic management software', 'clinic software India', 'clinic software Philippines', 'clinic management system', 'affordable clinic software', 'online clinic booking free'],
+    content: `
+      <h2>Why Clinic Management Software Matters</h2>
+      <p>Running a clinic without software in 2025 is like running a business without a phone. Patients expect to book appointments online. Doctors need instant access to patient history. Receptionists need automated tools to manage busy front desks without making costly errors.</p>
+
+      <h2>What to Look for in Clinic Management Software</h2>
+      <ul>
+        <li><strong>Online Appointment Booking:</strong> Patients should be able to book 24/7 without calling.</li>
+        <li><strong>Patient Records (EMR):</strong> Store medical history, prescriptions, and vitals digitally.</li>
+        <li><strong>Appointment Reminders:</strong> Automatic SMS or email reminders to reduce no-shows.</li>
+        <li><strong>Billing Management:</strong> Generate and track invoices and receipts.</li>
+        <li><strong>Multi-Doctor Support:</strong> Manage multiple doctors and specialties from one dashboard.</li>
+      </ul>
+
+      <h2>Clinixy — Best Free Clinic Management Software for Small Clinics</h2>
+      <p><strong>Clinixy</strong> is a cloud-based clinic management platform designed specifically for small to medium clinics across India, Philippines, and Hong Kong. It offers a full 14-day free trial with all features included — no credit card required.</p>
+      <ul>
+        <li>Custom subdomain booking portal (e.g., yourclinic.useclinixy.online)</li>
+        <li>Online patient appointment booking — 24/7</li>
+        <li>Complete digital patient records (EMR)</li>
+        <li>Automated appointment reminders</li>
+        <li>Multi-doctor scheduling and separate calendars</li>
+        <li>Digital billing and invoice generation</li>
+      </ul>
+
+      <h2>Pricing</h2>
+      <ul>
+        <li><strong>Starter Plan:</strong> ₹999/month — solo practitioners, up to 2 doctors</li>
+        <li><strong>Pro Plan:</strong> ₹1,999/month — growing polyclinics, up to 5 doctors, unlimited patients</li>
+        <li><strong>Premium Plan:</strong> ₹4,999/month — large hospitals and clinic chains</li>
+      </ul>
+      <p>All plans come with a free 14-day trial so you can test everything before committing. <a href="/register-clinic">Start your free trial today — no credit card required.</a></p>
+    `,
+  },
+  {
+    slug: 'clinic-management-software-philippines-complete-guide',
+    title: 'Clinic Management Software for Philippines Doctors — 2025 Guide',
+    description: 'Looking for clinic management software in the Philippines? Discover how Filipino clinics and doctors are using digital tools to manage appointments, patient records, and billing more efficiently.',
+    category: 'Clinic Management',
+    readTime: '5 min read',
+    publishedAt: '2025-07-10',
+    author: 'Clinixy Team',
+    authorRole: 'Healthcare Software Experts',
+    coverEmoji: '🇵🇭',
+    tags: ['clinic software Philippines', 'clinic management software Philippines', 'doctor appointment booking Philippines', 'patient management system Philippines', 'EMR software Philippines', 'online clinic booking Philippines'],
+    content: `
+      <h2>Why Filipino Clinics Need Digital Management Software</h2>
+      <p>The Philippines has one of the most dynamic and growing healthcare markets in Southeast Asia. Filipino clinics face increasing pressure to modernize their operations. Many still rely on manual appointment books, paper records, and phone calls for scheduling.</p>
+
+      <h2>Key Challenges for Clinics in the Philippines</h2>
+      <ul>
+        <li><strong>High Patient Volume:</strong> Popular clinics see 50–100 patients per day. Managing this manually is extremely difficult.</li>
+        <li><strong>No-Shows:</strong> Filipino patients frequently miss appointments without automated reminders.</li>
+        <li><strong>Manual Billing:</strong> Generating receipts manually leads to errors and lost revenue.</li>
+        <li><strong>Paper Records:</strong> Finding a returning patient's old record can take 10–15 minutes in a paper system.</li>
+      </ul>
+
+      <h2>How Clinixy Solves These Problems for Filipino Clinics</h2>
+      <p>Clinixy is a web-based clinic management platform that works perfectly for clinics in the Philippines. It runs entirely in a browser — no software installation needed — and works on any device including phones and tablets.</p>
+      <ul>
+        <li><strong>Online Booking Portal:</strong> Patients can schedule appointments 24/7 without calling.</li>
+        <li><strong>Automated Reminders:</strong> Drastically reducing no-shows.</li>
+        <li><strong>Digital Patient Records:</strong> Find any record in under 2 seconds.</li>
+        <li><strong>Multi-Doctor Scheduling:</strong> Perfect for polyclinics with multiple specialists.</li>
+      </ul>
+
+      <h2>Getting Started in the Philippines</h2>
+      <ol>
+        <li>Register at <a href="/register-clinic">useclinixy.online</a> — free for 14 days.</li>
+        <li>Create your clinic profile and add your doctors.</li>
+        <li>Share your booking portal link with patients via Facebook, Instagram, or your clinic's website.</li>
+        <li>Start managing appointments digitally from day one.</li>
+      </ol>
+      <p>Filipino patients are increasingly comfortable booking healthcare services online. Give them the convenience they expect. <a href="/register-clinic">Start your free Clinixy trial today.</a></p>
+    `,
+  },
 ];
 
 export const getBlogPost = (slug: string): BlogPost | undefined => {
   return blogPosts.find(post => post.slug === slug);
 };
+

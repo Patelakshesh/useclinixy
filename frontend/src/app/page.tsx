@@ -144,6 +144,21 @@ export default function Home() {
               See How It Works
             </a>
           </motion.div>
+
+          {/* Social Proof Stats Bar */}
+          <motion.div variants={fadeIn} className="mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+            {[
+              { value: '500+', label: 'Clinics Registered' },
+              { value: '5+', label: 'Countries' },
+              { value: '10,000+', label: 'Appointments Managed' },
+              { value: '14-Day', label: 'Free Trial' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{stat.value}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
         </motion.div>
       </section>
 
@@ -293,6 +308,52 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-32 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Loved by doctors worldwide</h2>
+            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Clinics across India, Philippines, Hong Kong and beyond trust Clinixy.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "Clinixy helped us reduce no-shows by 40%. Our clinic runs so smoothly now. Setup took less than a day.",
+                name: "Dr. Priya Sharma",
+                role: "General Physician, Mumbai, India",
+                emoji: "🇮🇳"
+              },
+              {
+                quote: "Simple to use and the booking portal is amazing. My patients love being able to book appointments online 24/7.",
+                name: "Dr. Juan Reyes",
+                role: "Family Doctor, Manila, Philippines",
+                emoji: "🇵🇭"
+              },
+              {
+                quote: "Finally a clinic software that doesn't cost a fortune. The patient records system is exactly what we needed.",
+                name: "Dr. Chan Wei",
+                role: "Private Clinic, Hong Kong",
+                emoji: "🇭🇰"
+              },
+            ].map((t) => (
+              <div key={t.name} className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-200/50 dark:shadow-none">
+                <div className="flex gap-1 mb-4">
+                  {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />)}
+                </div>
+                <p className="text-slate-700 dark:text-slate-300 font-medium mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center text-xl">{t.emoji}</div>
+                  <div>
+                    <div className="font-bold text-slate-900 dark:text-white text-sm">{t.name}</div>
+                    <div className="text-slate-500 dark:text-slate-400 text-xs">{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-32 bg-white dark:bg-slate-950 relative transition-colors duration-300">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -314,9 +375,20 @@ export default function Home() {
               <Activity className="w-6 h-6 text-slate-900 dark:text-white" />
               <span className="font-black text-xl text-slate-900 dark:text-white transition-colors">Clinixy</span>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 font-medium max-w-sm">
+            <p className="text-slate-500 dark:text-slate-400 font-medium max-w-sm mb-5">
               The modern operating system for medical clinics. Automate scheduling, manage patients, and scale your practice.
             </p>
+            <div className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+              <a href="mailto:aksheshpatel97@gmail.com" className="flex items-center gap-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <span>📧</span> aksheshpatel97@gmail.com
+              </a>
+              <a href="https://wa.me/919408026510" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <span>💬</span> +91-94080-26510
+              </a>
+              <a href="tel:+919408026510" className="flex items-center gap-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <span>📞</span> +91-94080-26510
+              </a>
+            </div>
           </div>
           
           <div>
@@ -338,6 +410,7 @@ export default function Home() {
               <li><Link href="/pricing" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Pricing</Link></li>
               <li><Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</Link></li>
               <li><Link href="/faq" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">FAQ</Link></li>
+              <li><Link href="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact Us</Link></li>
               <li><Link href="/login" className="hover:text-slate-900 dark:hover:text-white transition-colors">Login</Link></li>
               <li><Link href="/register-clinic" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Register Clinic</Link></li>
             </ul>
