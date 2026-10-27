@@ -5,6 +5,7 @@ import SubscriptionPlan from '../models/subscriptionPlan.model';
 import Subscription from '../models/subscription.model';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import { sendAdminNewClinicAlert } from '../services/email.service';
 
 export const checkSubdomain = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -174,6 +175,15 @@ export const registerClinic = async (req: Request, res: Response, next: NextFunc
 
     await session.commitTransaction();
     session.endSession();
+
+    // 🔔 Notify admin of new clinic signup (fire & forget — don't block the response)
+    sendAdminNewClinicAlert(
+      clinicName,
+      adminName,
+      adminEmail,
+      phone || '',
+      normalizedSubdomain
+    ).catch(err => console.error('[Admin Alert] New clinic alert failed silently:', err));
 
     res.status(201).json({ 
       success: true, 

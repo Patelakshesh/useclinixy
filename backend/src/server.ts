@@ -2,6 +2,7 @@ import app from './app';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { startSubscriptionExpiryJob } from './cron/subscriptionExpiry.job';
+import { startKeepAliveJob } from './cron/keepAlive.job';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const startServer = async () => {
 
     // Start background jobs
     startSubscriptionExpiryJob();
+    startKeepAliveJob();
 
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on port ${PORT}`);

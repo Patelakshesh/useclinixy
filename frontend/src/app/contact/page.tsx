@@ -33,7 +33,7 @@ const jsonLd = {
     contactPoint: [
       {
         '@type': 'ContactPoint',
-        email: 'hello@useclinixy.online',
+        email: 'aksheshpatel97@gmail.com',
         contactType: 'customer support',
         availableLanguage: ['English', 'Hindi'],
         areaServed: ['IN', 'PH', 'HK', 'AE', 'AU'],
@@ -157,7 +157,7 @@ export default function ContactPage() {
           <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 shadow-xl shadow-slate-200/50 dark:shadow-none">
             <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6">Send us a message</h2>
             <form
-              action="https://formsubmit.co/hello@useclinixy.online"
+              action="https://formsubmit.co/aksheshpatel97@gmail.com"
               method="POST"
               className="space-y-5"
             >

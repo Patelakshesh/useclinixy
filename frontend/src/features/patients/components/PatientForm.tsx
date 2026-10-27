@@ -17,7 +17,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export const PatientForm = ({ onSubmit, defaultValues, loading }: any) => {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues });
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) as any, defaultValues });
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>

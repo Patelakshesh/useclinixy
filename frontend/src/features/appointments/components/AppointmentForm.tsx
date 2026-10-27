@@ -29,7 +29,7 @@ export const AppointmentForm = ({ onSubmit, defaultValues, loading, onCreateNewP
   const currentTime = rounded.toTimeString().split(' ')[0].substring(0, 5); // HH:mm
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<FormData>({ 
-    resolver: zodResolver(schema), 
+    resolver: zodResolver(schema) as any, 
     defaultValues: {
       appointmentDate: currentDate,
       appointmentTime: currentTime,

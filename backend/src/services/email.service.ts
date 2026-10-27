@@ -161,3 +161,111 @@ export const sendWelcomeEmail = async (to: string, name: string, clinicName: str
     throw error;
   }
 };
+
+// ─── ADMIN ALERT: New Clinic Registered ──────────────────────────────────────
+export const sendAdminNewClinicAlert = async (
+  clinicName: string,
+  adminName: string,
+  adminEmail: string,
+  adminPhone: string,
+  subdomain: string
+): Promise<void> => {
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER;
+  const ownerEmail = process.env.OWNER_ALERT_EMAIL || 'aksheshpatel97@gmail.com';
+
+  if (!apiKey || !senderEmail) return;
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+      <div style="background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%); padding: 28px 36px;">
+        <h1 style="color: #fff; margin: 0; font-size: 20px; font-weight: 700;">🎉 New Clinic Registered — Clinixy</h1>
+      </div>
+      <div style="padding: 36px;">
+        <p style="color: #1e293b; font-size: 16px; margin: 0 0 20px;">A new clinic just signed up for Clinixy. Here are their details:</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #f1f5f9; width: 40%;">Clinic Name</td><td style="padding: 10px 0; font-weight: 600; color: #1e293b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">${clinicName}</td></tr>
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">Admin Name</td><td style="padding: 10px 0; font-weight: 600; color: #1e293b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">${adminName}</td></tr>
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">Email</td><td style="padding: 10px 0; font-weight: 600; color: #2563eb; font-size: 14px; border-bottom: 1px solid #f1f5f9;"><a href="mailto:${adminEmail}" style="color: #2563eb;">${adminEmail}</a></td></tr>
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">Phone</td><td style="padding: 10px 0; font-weight: 600; color: #1e293b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">${adminPhone || 'Not provided'}</td></tr>
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px;">Subdomain</td><td style="padding: 10px 0; font-weight: 600; color: #1e293b; font-size: 14px;"><a href="https://${subdomain}.useclinixy.online" style="color: #2563eb;">${subdomain}.useclinixy.online</a></td></tr>
+        </table>
+        <div style="margin-top: 28px; padding: 16px; background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px;">
+          <p style="margin: 0; color: #15803d; font-size: 14px; font-weight: 600;">✅ Action: Contact them within 24 hours to welcome them and offer support.</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  try {
+    await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'api-key': apiKey },
+      body: JSON.stringify({
+        sender: { name: 'Clinixy Alerts', email: senderEmail },
+        to: [{ email: ownerEmail, name: 'Clinixy Owner' }],
+        subject: `🎉 New Signup: ${clinicName} just registered on Clinixy`,
+        htmlContent: html
+      })
+    });
+    console.log(`[Admin Alert] New clinic signup notification sent for: ${clinicName}`);
+  } catch (error) {
+    console.error('[Admin Alert] Failed to send new clinic notification:', error);
+  }
+};
+
+// ─── ADMIN ALERT: Trial About to Expire ──────────────────────────────────────
+export const sendAdminTrialExpiryAlert = async (
+  clinicName: string,
+  clinicEmail: string,
+  clinicPhone: string,
+  subdomain: string,
+  daysLeft: number
+): Promise<void> => {
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER;
+  const ownerEmail = process.env.OWNER_ALERT_EMAIL || 'aksheshpatel97@gmail.com';
+
+  if (!apiKey || !senderEmail) return;
+
+  const urgencyColor = daysLeft <= 1 ? '#ef4444' : daysLeft <= 3 ? '#f97316' : '#eab308';
+  const urgencyText = daysLeft === 0 ? 'EXPIRED TODAY' : daysLeft === 1 ? '1 DAY LEFT' : `${daysLeft} DAYS LEFT`;
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+      <div style="background: ${urgencyColor}; padding: 28px 36px;">
+        <h1 style="color: #fff; margin: 0; font-size: 20px; font-weight: 700;">⚠️ Trial Expiring — ${urgencyText}</h1>
+      </div>
+      <div style="padding: 36px;">
+        <p style="color: #1e293b; font-size: 16px; margin: 0 0 20px;">A clinic's free trial is ending soon. Contact them now to convert to a paid plan:</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #f1f5f9; width: 40%;">Clinic Name</td><td style="padding: 10px 0; font-weight: 600; color: #1e293b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">${clinicName}</td></tr>
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">Email</td><td style="padding: 10px 0; font-weight: 600; font-size: 14px; border-bottom: 1px solid #f1f5f9;"><a href="mailto:${clinicEmail}" style="color: #2563eb;">${clinicEmail}</a></td></tr>
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">Phone</td><td style="padding: 10px 0; font-weight: 600; color: #1e293b; font-size: 14px; border-bottom: 1px solid #f1f5f9;">${clinicPhone || 'Not provided'}</td></tr>
+          <tr><td style="padding: 10px 0; color: #64748b; font-size: 14px;">Days Left</td><td style="padding: 10px 0; font-weight: 800; color: ${urgencyColor}; font-size: 16px;">${urgencyText}</td></tr>
+        </table>
+        <div style="margin-top: 28px; display: flex; gap: 12px;">
+          <a href="mailto:${clinicEmail}" style="display: inline-block; background: #2563eb; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-right: 12px;">📧 Email Them</a>
+          <a href="https://wa.me/${clinicPhone?.replace(/[^0-9]/g, '')}" style="display: inline-block; background: #22c55e; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;">💬 WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  try {
+    await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'api-key': apiKey },
+      body: JSON.stringify({
+        sender: { name: 'Clinixy Alerts', email: senderEmail },
+        to: [{ email: ownerEmail, name: 'Clinixy Owner' }],
+        subject: `⚠️ Trial Expiring [${urgencyText}]: ${clinicName} — Contact Now`,
+        htmlContent: html
+      })
+    });
+    console.log(`[Admin Alert] Trial expiry alert sent for: ${clinicName} (${daysLeft} days left)`);
+  } catch (error) {
+    console.error('[Admin Alert] Failed to send trial expiry alert:', error);
+  }
+};
+

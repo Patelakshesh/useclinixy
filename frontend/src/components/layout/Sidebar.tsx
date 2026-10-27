@@ -20,11 +20,11 @@ const navItems = [
 ];
 
 interface SidebarProps {
-  isOpen: boolean;
-  setIsOpen: (val: boolean) => void;
+  isOpen?: boolean;
+  setIsOpen?: (val: boolean) => void;
 }
 
-export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
+export const Sidebar = ({ isOpen = false, setIsOpen = () => {} }: SidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();

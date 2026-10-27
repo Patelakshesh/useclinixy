@@ -20,7 +20,7 @@ export default function Home() {
     }
   };
 
-  const floatAnimation = {
+  const floatAnimation: any = {
     animate: {
       y: [0, -15, 0],
       transition: {

@@ -481,7 +481,7 @@ export default function PublicBookingPage() {
               </div>
 
               <button 
-                onClick={() => { setStep(1); setSelectedDoctor(null); setSelectedTime(''); setPatientDetails({name:'', phone:'', age:'', gender:'MALE'}); }}
+                onClick={() => { setStep(1); setSelectedDoctor(null); setSelectedTime(''); setPatientDetails({name:'', phone:'', email:'', age:'', gender:'MALE'}); }}
                 className="mt-8 text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium hover:underline"
               >
                 Book Another Appointment
