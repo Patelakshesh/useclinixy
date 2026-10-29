@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminFeedbacks, updateFeedbackStatus, deleteFeedback } from '@/features/admin/api/admin';
 import { 
   MessageSquareHeart, Star, Sparkles, Lightbulb, Bug, MessageSquare, 
-  Search, Filter, CheckCircle2, Clock, Trash2, Phone, Mail, 
-  ChevronLeft, ChevronRight, Building2, User, MessageCircle 
+  Search, Filter, Clock, Trash2, Mail, 
+  ChevronLeft, ChevronRight, ChevronDown, Check, Building2, User, MessageCircle 
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -18,12 +18,104 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: any; color: string;
   GENERAL: { label: 'General', icon: MessageSquare, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' },
 };
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  NEW: { label: 'New', color: 'text-blue-700 dark:text-blue-300', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-  IN_REVIEW: { label: 'In Review', color: 'text-amber-700 dark:text-amber-300', bg: 'bg-amber-100 dark:bg-amber-900/30' },
-  RESOLVED: { label: 'Implemented / Resolved', color: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
-  CLOSED: { label: 'Closed', color: 'text-slate-700 dark:text-neutral-400', bg: 'bg-slate-100 dark:bg-neutral-800' },
+const STATUS_CONFIG: Record<string, { label: string; dot: string; color: string; bg: string }> = {
+  NEW: { 
+    label: 'New', 
+    dot: 'bg-blue-500', 
+    color: 'text-blue-700 dark:text-blue-300', 
+    bg: 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/60' 
+  },
+  IN_REVIEW: { 
+    label: 'In Review', 
+    dot: 'bg-amber-500', 
+    color: 'text-amber-700 dark:text-amber-300', 
+    bg: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800/60' 
+  },
+  RESOLVED: { 
+    label: 'Resolved', 
+    dot: 'bg-emerald-500', 
+    color: 'text-emerald-700 dark:text-emerald-300', 
+    bg: 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800/60' 
+  },
+  CLOSED: { 
+    label: 'Closed', 
+    dot: 'bg-slate-400', 
+    color: 'text-slate-700 dark:text-neutral-300', 
+    bg: 'bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 border border-slate-200 dark:border-neutral-700' 
+  },
 };
+
+interface StatusMenuProps {
+  currentStatus: string;
+  onSelect: (status: string) => void;
+  disabled?: boolean;
+}
+
+function StatusMenu({ currentStatus, onSelect, disabled }: StatusMenuProps) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    if (open) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [open]);
+
+  const current = STATUS_CONFIG[currentStatus] || STATUS_CONFIG.NEW;
+
+  return (
+    <div className="relative inline-block text-left" ref={menuRef}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((prev) => !prev)}
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${current.bg} ${current.color}`}
+      >
+        <span className={`w-2 h-2 rounded-full ${current.dot}`} />
+        <span>{current.label}</span>
+        <ChevronDown className={`w-3.5 h-3.5 opacity-70 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-44 rounded-xl bg-white dark:bg-[#181818] border border-slate-200 dark:border-neutral-700 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-500">
+            Change Status
+          </div>
+          {Object.entries(STATUS_CONFIG).map(([key, config]) => {
+            const isSelected = key === currentStatus;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  onSelect(key);
+                  setOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  isSelected
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-semibold'
+                    : 'text-slate-700 dark:text-neutral-200 hover:bg-slate-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${config.dot}`} />
+                  <span>{config.label}</span>
+                </div>
+                {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminFeedbackPage() {
   const queryClient = useQueryClient();
@@ -166,11 +258,11 @@ export default function AdminFeedbackPage() {
               }}
               className="py-2 px-3 text-sm bg-slate-50 dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl text-slate-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="ALL">All Categories</option>
-              <option value="FEATURE_REQUEST">Feature Requests</option>
-              <option value="IMPROVEMENT">Improvements</option>
-              <option value="BUG">Bug Reports</option>
-              <option value="GENERAL">General</option>
+              <option value="ALL" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">All Categories</option>
+              <option value="FEATURE_REQUEST" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">Feature Requests</option>
+              <option value="IMPROVEMENT" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">Improvements</option>
+              <option value="BUG" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">Bug Reports</option>
+              <option value="GENERAL" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">General</option>
             </select>
 
             <select
@@ -181,11 +273,11 @@ export default function AdminFeedbackPage() {
               }}
               className="py-2 px-3 text-sm bg-slate-50 dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl text-slate-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="ALL">All Statuses</option>
-              <option value="NEW">New</option>
-              <option value="IN_REVIEW">In Review</option>
-              <option value="RESOLVED">Resolved</option>
-              <option value="CLOSED">Closed</option>
+              <option value="ALL" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">All Statuses</option>
+              <option value="NEW" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">New</option>
+              <option value="IN_REVIEW" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">In Review</option>
+              <option value="RESOLVED" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">Resolved</option>
+              <option value="CLOSED" className="bg-white text-slate-900 dark:bg-neutral-900 dark:text-white">Closed</option>
             </select>
           </div>
         </div>
@@ -214,7 +306,6 @@ export default function AdminFeedbackPage() {
         <div className="space-y-4">
           {feedbacks.map((fb: any) => {
             const cat = CATEGORY_CONFIG[fb.category] || CATEGORY_CONFIG.GENERAL;
-            const status = STATUS_CONFIG[fb.status] || STATUS_CONFIG.NEW;
             const CatIcon = cat.icon;
             const waLink = getWhatsAppLink(fb);
 
@@ -251,19 +342,13 @@ export default function AdminFeedbackPage() {
                     </span>
                   </div>
 
-                  {/* Status Dropdown */}
+                  {/* Status Dropdown Menu & Delete */}
                   <div className="flex items-center gap-2">
-                    <select
-                      value={fb.status}
-                      onChange={(e) => updateStatusMutation.mutate({ id: fb._id, status: e.target.value })}
+                    <StatusMenu
+                      currentStatus={fb.status}
+                      onSelect={(newStatus) => updateStatusMutation.mutate({ id: fb._id, status: newStatus })}
                       disabled={updateStatusMutation.isPending}
-                      className={`text-xs font-semibold px-3 py-1.5 rounded-lg border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${status.bg} ${status.color}`}
-                    >
-                      <option value="NEW">New</option>
-                      <option value="IN_REVIEW">In Review</option>
-                      <option value="RESOLVED">Resolved</option>
-                      <option value="CLOSED">Closed</option>
-                    </select>
+                    />
 
                     <button
                       onClick={() => {
