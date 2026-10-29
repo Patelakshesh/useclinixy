@@ -168,7 +168,8 @@ export const registerClinic = async (req: Request, res: Response, next: NextFunc
       await subscription.save({ session });
       successMessage = `Clinic registered successfully. You have been assigned the ${defaultPlan.name} plan!`;
       
-      // Update clinic status to ACTIVE since they have a subscription
+      // Link subscription to clinic and set status to ACTIVE
+      clinic.subscriptionId = subscription._id as any;
       clinic.status = 'ACTIVE';
       await clinic.save({ session });
     }

@@ -15,7 +15,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Clinics', href: '/admin/clinics', icon: Building2 },
+    { name: 'Clinics & Leads', href: '/admin/clinics', icon: Building2 },
     { name: 'Plans', href: '/admin/plans', icon: Tag },
     { name: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard },
     { name: 'Audit Logs', href: '/admin/audit', icon: ShieldAlert },

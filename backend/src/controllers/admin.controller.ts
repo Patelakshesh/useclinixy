@@ -14,7 +14,7 @@ import Vitals from '../models/vitals.model';
 import { logAudit } from '../utils/auditLog.util';
 export const getAdminDashboardMetrics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const totalClinics = await Clinic.countDocuments();
+    const totalClinics = await Clinic.countDocuments({ status: { $ne: 'DELETED' } });
     const activeClinics = await Clinic.countDocuments({ status: 'ACTIVE' });
     const trialClinics = await Clinic.countDocuments({ status: 'TRIAL' });
     const suspendedClinics = await Clinic.countDocuments({ status: 'SUSPENDED' });
@@ -25,11 +25,26 @@ export const getAdminDashboardMetrics = async (req: Request, res: Response, next
         mrr += sub.planId.interval === 'YEARLY' ? sub.planId.price / 12 : sub.planId.price;
       }
     });
-    const recentClinics = await Clinic.find()
+
+    const recentClinicsRaw = await Clinic.find({ status: { $ne: 'DELETED' } })
       .sort({ createdAt: -1 })
-      .limit(5)
-      .populate('ownerId', 'name email')
-      .populate({ path: 'subscriptionId', populate: { path: 'planId', select: 'name price interval' } });
+      .limit(8)
+      .populate('ownerId', 'name email status role')
+      .populate({ path: 'subscriptionId', populate: { path: 'planId', select: 'name price interval' } })
+      .lean();
+
+    const recentClinics = await Promise.all(
+      recentClinicsRaw.map(async (c: any) => {
+        if (!c.subscriptionId) {
+          const sub = await Subscription.findOne({ clinicId: c._id })
+            .populate('planId', 'name price interval')
+            .lean();
+          if (sub) c.subscriptionId = sub;
+        }
+        return c;
+      })
+    );
+
     res.status(200).json({ success: true, data: { kpis: { totalClinics, activeClinics, trialClinics, suspendedClinics, mrr }, recentClinics } });
   } catch (error) { next(error); }
 };
@@ -39,9 +54,37 @@ export const getAllClinics = async (req: Request, res: Response, next: NextFunct
     const { status, search } = req.query;
     let filter: any = { status: { $ne: 'DELETED' } };
     if (status) filter.status = status;
-    if (search) { filter.$or = [{ name: { $regex: search, $options: 'i' } }, { subdomain: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }]; }
-    const clinics = await Clinic.find(filter).populate('ownerId', 'name email').populate({ path: 'subscriptionId', select: 'planId' }).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: clinics });
+    if (search) { 
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } }, 
+        { subdomain: { $regex: search, $options: 'i' } }, 
+        { email: { $regex: search, $options: 'i' } },
+        { mobileNumber: { $regex: search, $options: 'i' } }
+      ]; 
+    }
+
+    const clinics = await Clinic.find(filter)
+      .populate('ownerId', 'name email role createdAt status')
+      .populate({ 
+        path: 'subscriptionId', 
+        populate: { path: 'planId', select: 'name price interval intervalCount' } 
+      })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const enrichedClinics = await Promise.all(
+      clinics.map(async (c: any) => {
+        if (!c.subscriptionId) {
+          const sub = await Subscription.findOne({ clinicId: c._id })
+            .populate('planId', 'name price interval intervalCount')
+            .lean();
+          if (sub) c.subscriptionId = sub;
+        }
+        return c;
+      })
+    );
+
+    res.status(200).json({ success: true, data: enrichedClinics });
   } catch (error) { next(error); }
 };
 

@@ -198,7 +198,7 @@ export const sendAdminNewClinicAlert = async (
   `;
 
   try {
-    await fetch('https://api.brevo.com/v3/smtp/email', {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'api-key': apiKey },
       body: JSON.stringify({
@@ -208,6 +208,13 @@ export const sendAdminNewClinicAlert = async (
         htmlContent: html
       })
     });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error(`[Admin Alert] Brevo API rejected email (${response.status}):`, errText);
+      return;
+    }
+
     console.log(`[Admin Alert] New clinic signup notification sent for: ${clinicName}`);
   } catch (error) {
     console.error('[Admin Alert] Failed to send new clinic notification:', error);
@@ -253,7 +260,7 @@ export const sendAdminTrialExpiryAlert = async (
   `;
 
   try {
-    await fetch('https://api.brevo.com/v3/smtp/email', {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'api-key': apiKey },
       body: JSON.stringify({
@@ -263,6 +270,13 @@ export const sendAdminTrialExpiryAlert = async (
         htmlContent: html
       })
     });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error(`[Admin Alert] Brevo API rejected trial expiry email (${response.status}):`, errText);
+      return;
+    }
+
     console.log(`[Admin Alert] Trial expiry alert sent for: ${clinicName} (${daysLeft} days left)`);
   } catch (error) {
     console.error('[Admin Alert] Failed to send trial expiry alert:', error);
