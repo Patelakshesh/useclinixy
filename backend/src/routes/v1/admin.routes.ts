@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getAdminDashboardMetrics, getAllClinics, updateClinicStatus, deleteClinic, getAllSubscriptions, getAuditLogs, getPlansAdmin, createPlan, updatePlan, deletePlan, assignManualSubscription } from '../../controllers/admin.controller';
+import { getAdminFeedbacks, updateFeedbackStatus, deleteFeedback } from '../../controllers/feedback.controller';
 import { requireAuth, requireSuperAdmin } from '../../middlewares/auth.middleware';
 
 const router = Router();
@@ -21,6 +22,11 @@ router.get('/subscriptions', getAllSubscriptions);
 // Audit Logs
 router.get('/audit-logs', getAuditLogs);
 
+// Feedback Management
+router.get('/feedback', getAdminFeedbacks);
+router.patch('/feedback/:id', updateFeedbackStatus);
+router.delete('/feedback/:id', deleteFeedback);
+
 // Plan Management (CRUD)
 router.get('/plans', getPlansAdmin);
 router.post('/plans', createPlan);
@@ -28,3 +34,4 @@ router.put('/plans/:id', updatePlan);
 router.delete('/plans/:id', deletePlan);
 
 export default router;
+

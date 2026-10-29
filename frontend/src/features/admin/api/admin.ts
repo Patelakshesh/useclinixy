@@ -57,3 +57,19 @@ export const deleteAdminPlan = async (id: string) => {
   const response = await adminApi.delete(`/admin/plans/${id}`);
   return response.data;
 };
+
+export const getAdminFeedbacks = async (params?: { page?: number; limit?: number; status?: string; category?: string; search?: string }) => {
+  const response = await adminApi.get('/admin/feedback', { params });
+  return response.data.data;
+};
+
+export const updateFeedbackStatus = async (id: string, data: { status?: string; adminNotes?: string }) => {
+  const response = await adminApi.patch(`/admin/feedback/${id}`, data);
+  return response.data;
+};
+
+export const deleteFeedback = async (id: string) => {
+  const response = await adminApi.delete(`/admin/feedback/${id}`);
+  return response.data;
+};
+

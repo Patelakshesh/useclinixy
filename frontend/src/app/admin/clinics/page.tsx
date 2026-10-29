@@ -165,6 +165,7 @@ export default function AdminClinics() {
     const phone = cleanPhone(clinic.mobileNumber || clinic.phone);
     if (!phone) return '#';
     const formattedPhone = phone.startsWith('91') || phone.length > 10 ? phone : `91${phone}`;
+    const doctorName = clinic.ownerId?.name ? `Dr. ${clinic.ownerId.name}` : (clinic.name || 'Doctor');
     const message = encodeURIComponent(`Hello ${doctorName}, thank you for registering ${clinic.name} on Clinixy! We're here to help you get started with your clinic setup. Do you have any questions or would you like a quick walkthrough?`);
     return `https://wa.me/${formattedPhone}?text=${message}`;
   };

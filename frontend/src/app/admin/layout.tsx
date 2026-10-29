@@ -3,7 +3,7 @@
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Building2, CreditCard, ShieldAlert, LogOut, Tag, Menu } from 'lucide-react';
+import { LayoutDashboard, Building2, CreditCard, ShieldAlert, LogOut, Tag, Menu, MessageSquareHeart } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentUser, logoutUser } from '@/features/auth/api/auth';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -16,6 +16,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Clinics & Leads', href: '/admin/clinics', icon: Building2 },
+    { name: 'Feedback & Ideas', href: '/admin/feedback', icon: MessageSquareHeart },
     { name: 'Plans', href: '/admin/plans', icon: Tag },
     { name: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard },
     { name: 'Audit Logs', href: '/admin/audit', icon: ShieldAlert },
