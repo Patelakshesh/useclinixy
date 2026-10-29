@@ -20,9 +20,9 @@ const feedbackSchema: Schema = new Schema(
   {
     clinicId: { type: Schema.Types.ObjectId, ref: 'Clinic', default: null },
     clinicName: { type: String, default: '' },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    userName: { type: String, required: true },
-    userEmail: { type: String, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    userName: { type: String, default: 'Clinic User' },
+    userEmail: { type: String, default: 'clinic@useclinixy.com' },
     userRole: { type: String, default: 'CLINIC_ADMIN' },
     rating: { type: Number, required: true, min: 1, max: 5, default: 5 },
     category: { 

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Feedback from '../models/feedback.model';
 import Clinic from '../models/clinic.model';
+import User from '../models/user.model';
 import { logAudit } from '../utils/auditLog.util';
 
 export const submitFeedback = async (req: any, res: Response, next: NextFunction): Promise<void> => {
@@ -21,31 +22,47 @@ export const submitFeedback = async (req: any, res: Response, next: NextFunction
     const validCategories = ['FEATURE_REQUEST', 'IMPROVEMENT', 'BUG', 'GENERAL'];
     const feedbackCategory = validCategories.includes(category) ? category : 'IMPROVEMENT';
 
+    const userId = req.user?.userId || req.user?.id || req.user?._id;
+    let userName = 'Clinic User';
+    let userEmail = 'clinic@useclinixy.com';
+    let userRole = req.user?.role || 'CLINIC_ADMIN';
+    let clinicId = req.user?.clinicId || null;
     let clinicName = '';
-    if (req.user?.clinicId) {
-      const clinic = await Clinic.findById(req.user.clinicId).select('name').lean();
-      if (clinic) clinicName = clinic.name;
+
+    if (userId) {
+      const userDoc = await User.findById(userId).select('name email role clinicId').lean();
+      if (userDoc) {
+        if (userDoc.name) userName = userDoc.name;
+        if (userDoc.email) userEmail = userDoc.email;
+        if (userDoc.role) userRole = userDoc.role;
+        if (!clinicId && userDoc.clinicId) clinicId = userDoc.clinicId;
+      }
+    }
+
+    if (clinicId) {
+      const clinic = await Clinic.findById(clinicId).select('name').lean();
+      if (clinic?.name) clinicName = clinic.name;
     }
 
     const feedback = await Feedback.create({
-      clinicId: req.user?.clinicId || null,
+      clinicId: clinicId || null,
       clinicName,
-      userId: req.user?.id || req.user?._id,
-      userName: req.user?.name || 'Clinic User',
-      userEmail: req.user?.email || '',
-      userRole: req.user?.role || 'CLINIC_ADMIN',
+      userId: userId || null,
+      userName,
+      userEmail,
+      userRole,
       rating: numRating,
       category: feedbackCategory,
       message: message.trim(),
       status: 'NEW',
     });
 
-    if (req.user?.id) {
+    if (userId) {
       await logAudit(
-        req.user.id || req.user._id,
+        userId,
         'SUBMIT_FEEDBACK',
         { feedbackId: feedback._id, category: feedbackCategory, rating: numRating },
-        req.user.clinicId,
+        clinicId,
         req.ip
       );
     }
