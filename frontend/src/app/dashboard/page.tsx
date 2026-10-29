@@ -17,6 +17,7 @@ export default function DashboardPage() {
     totalPatients: 0,
     todaysAppointments: 0,
     upcomingAppointments: 0,
+    trends: null as any,
     chartData: [] as any[],
   });
   const [loading, setLoading] = useState(true);
@@ -62,10 +63,34 @@ export default function DashboardPage() {
   };
 
   const statCards = [
-    { title: 'Total Doctors', value: stats.totalDoctors, icon: Stethoscope, trend: '+12%', trendUp: true, sparkline: [10, 25, 15, 30, 20, 40, 50] },
-    { title: 'Total Patients', value: stats.totalPatients, icon: Users, trend: '+5%', trendUp: true, sparkline: [20, 10, 30, 15, 40, 25, 45] },
-    { title: "Today's Appointments", value: stats.todaysAppointments, icon: Clock, trend: '+2', trendUp: true, sparkline: [5, 15, 10, 20, 15, 25, 30] },
-    { title: 'Upcoming', value: stats.upcomingAppointments, icon: Calendar, trend: '-1%', trendUp: false, sparkline: [40, 30, 45, 25, 35, 20, 15] },
+    { 
+      title: 'Total Doctors', 
+      value: stats.totalDoctors, 
+      icon: Stethoscope, 
+      trend: stats.trends?.doctors || (stats.totalDoctors > 0 ? `${stats.totalDoctors} active doctor${stats.totalDoctors > 1 ? 's' : ''}` : 'No doctors registered'), 
+      trendUp: stats.trends?.doctorsPositive ?? (stats.totalDoctors > 0) 
+    },
+    { 
+      title: 'Total Patients', 
+      value: stats.totalPatients, 
+      icon: Users, 
+      trend: stats.trends?.patients || (stats.totalPatients > 0 ? `${stats.totalPatients} registered` : '0 new this month'), 
+      trendUp: stats.trends?.patientsPositive ?? (stats.totalPatients > 0) 
+    },
+    { 
+      title: "Today's Appointments", 
+      value: stats.todaysAppointments, 
+      icon: Clock, 
+      trend: stats.trends?.todaysAppointments || (stats.todaysAppointments > 0 ? `${stats.todaysAppointments} scheduled today` : 'No visits scheduled today'), 
+      trendUp: stats.trends?.todaysPositive ?? (stats.todaysAppointments > 0) 
+    },
+    { 
+      title: 'Upcoming', 
+      value: stats.upcomingAppointments, 
+      icon: Calendar, 
+      trend: stats.trends?.upcoming || (stats.upcomingAppointments > 0 ? `${stats.upcomingAppointments} upcoming visit${stats.upcomingAppointments > 1 ? 's' : ''}` : 'No upcoming visits'), 
+      trendUp: stats.trends?.upcomingPositive ?? (stats.upcomingAppointments > 0) 
+    },
   ];
 
   const chartData = stats.chartData || [];
@@ -123,11 +148,24 @@ export default function DashboardPage() {
             </div>
             
             <div className="mt-4 flex items-center justify-between text-xs">
-               <div className={`flex items-center gap-1 font-medium ${card.trendUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-neutral-500'}`}>
-                 {card.trendUp ? <TrendingUp className="h-3 w-3" /> : <Activity className="h-3 w-3" />}
-                 {card.trend}
-                 <span className="text-slate-400 dark:text-neutral-600 font-normal ml-1">vs last month</span>
-               </div>
+              {loading ? (
+                <div className="h-4 w-28 animate-pulse rounded bg-slate-100 dark:bg-neutral-800/50" />
+              ) : (
+                <div className={`flex items-center gap-1.5 font-medium ${
+                  card.trendUp === true 
+                    ? 'text-emerald-600 dark:text-emerald-400' 
+                    : card.trendUp === false 
+                    ? 'text-rose-500 dark:text-rose-400' 
+                    : 'text-slate-500 dark:text-neutral-500'
+                }`}>
+                  {card.trendUp === true ? (
+                    <TrendingUp className="h-3.5 w-3.5" />
+                  ) : (
+                    <Activity className="h-3.5 w-3.5" />
+                  )}
+                  <span>{card.trend}</span>
+                </div>
+              )}
             </div>
           </motion.div>
         ))}
